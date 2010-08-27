@@ -20,6 +20,7 @@ function prepareParams(){
 	config.loadData(args[1]);
 	var params = cmdLine.parseParams(args.slice(2));
 	config.setValues(params);
+//console.log('config = ', config);
 };
 var _jsToolsPath = environment["user.dir"] + "/" + args[0];
 load(_jsToolsPath + "/_global.js");
