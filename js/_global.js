@@ -73,6 +73,19 @@ function _loadTextFile(fileName, throwError){
 };
 
 
+var cmdLine = {
+	parseParams:function(params){
+		// summary: Take apart the params and return key-value pairs.
+		var ret = {};
+		for (var i=0, l=params.length, p; i<l; i++){
+			p = params[i];
+			var valueStart = p.indexOf("="); // Find the "="
+			ret[p.substr(0, valueStart)] = p.substr(valueStart+1);
+		}
+		return ret;
+	}
+}
+
 
 var config = {
 	// summary: The config object, which contains all the config data and logic.
@@ -83,6 +96,10 @@ var config = {
 
 	loadData:function(file){
 		this._rawData = _loadJsonFile(file);
-	}
+	},
+	
+	setValues:function(params){
+		
+	},
 	
 }
