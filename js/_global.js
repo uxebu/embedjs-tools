@@ -22,7 +22,7 @@ if (typeof console=="undefined"){
 			print(out.join("    "));
 		},
 		log:function(){
-			if (!params.debug) return;
+			if (!config.isVerbose) return;
 			this._log.apply(this, arguments);
 		},
 		error:function(){
@@ -121,11 +121,12 @@ var config = {
 	setValues:function(params){
 		var d = this._rawData;
 		var defaults = d.defaults;
+		this.isVerbose = d.isVerbose;
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
 		var platform = params.platform || defaults.platform;
-		this.platformFile = this.rootDirectory + "/" + d.paths.platforms + "/" + platform + ".json";
-		this.sourceDirectory = this.rootDirectory + "/" + d.paths.source;
+		this.platformFile = endInSlash(this.rootDirectory + "/" + d.paths.platforms) + platform + ".json";
+		this.sourceDirectory = endInSlash(this.rootDirectory + "/" + d.paths.source);
 	},
 	
 }
