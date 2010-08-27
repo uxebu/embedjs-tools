@@ -20,10 +20,6 @@ function prepareParams(){
 	config.loadData(args[1]);
 	var params = cmdLine.parseParams(args.slice(2));
 	config.setValues(params);
-quit();
-	//params.platformName = args[2];
-	//params.profileName = args[3];
-	//params.debug = !!args[4];
 };
 var _jsToolsPath = environment["user.dir"] + "/" + args[0];
 load(_jsToolsPath + "/_global.js");
