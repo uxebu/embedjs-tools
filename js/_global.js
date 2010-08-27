@@ -12,6 +12,7 @@ if (typeof console=="undefined"){
 					out.push(""+arg);
 				} else if (typeof arg=="object"){
 					for (var key in arg){
+						if (typeof arg[key]=="function") continue;
 						out.push(key+": "+arg[key]+"\n");
 					}
 				} else {
@@ -93,13 +94,38 @@ var config = {
 	// This is the config data as we read it from the config file
 	// of the project we are just building.
 	_rawData:null,
+	
+	// Shall debug messages be shown?
+	isVerbose:false,
+	
+	// The directory where the "build-config.json" lies
+	// all paths in _rawData are relative to this directory.
+	rootDirectory:"",
+	
+	// The profile we use, e.g. "kitchensink".
+	profile:"",
+	
+	// The list of features, just some strings that are needed to resolve the deps.
+	features:[],
+	
+	platformFile:"",
+	
+	sourceDirectory:"",
 
 	loadData:function(file){
 		this._rawData = _loadJsonFile(file);
+		// We rely on the directory to use "/"!!! may fail on windows!
+		this.rootDirectory = file.split("/").slice(0, -1).join("/");
 	},
 	
 	setValues:function(params){
-		
+		var d = this._rawData;
+		var defaults = d.defaults;
+		this.profile = params.profile || defaults.profile;
+		this.features = d.profiles[this.profile];
+		var platform = params.platform || defaults.platform;
+		this.platformFile = this.rootDirectory + "/" + d.paths.platforms + "/" + platform + ".json";
+		this.sourceDirectory = this.rootDirectory + "/" + d.paths.source;
 	},
 	
 }
