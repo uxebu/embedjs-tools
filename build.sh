@@ -1,4 +1,16 @@
 DIR=`dirname $0`
+CUR_DIR=`pwd`
+
+java -jar $DIR/js.jar $DIR/js/build.js $DIR/js $CUR_DIR/build-config.json $@
+
+exit;
+
+
+
+
+
+
+DIR=`dirname $0`
 
 # TODO actually the check should valllidate if this is a valid definition file
 if [ -z "$1" ]; then
