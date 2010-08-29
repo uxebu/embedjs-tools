@@ -13,7 +13,7 @@ function main(){
 	// 		Load the platform JSON file (like Android.json) which contains all the features mapped to the exact js files.
 	// description:
 	// 		If features are given resolve teh dependencies and concat the files resulting form that.
-	var modules = _loadJsonFile(config.platformFile);
+	var modules = util._loadJsonFile(config.platformFile);
 	globals.modules = modules;
 	var files = [];
 	if (features.length==0){
@@ -94,7 +94,7 @@ function resolveDeps(file){
 	if (typeof globals.dependencyData[file]=="undefined"){
 		var path = file.split("/");
 		var f = path.pop(); // The filename e.g. "declare.js"
-		var deps = _loadJsonFile(config.sourceDirectory + (path.length?path.join("/"):"") + "/dependencies.json", false);
+		var deps = util._loadJsonFile(config.sourceDirectory + (path.length?path.join("/"):"") + "/dependencies.json", false);
 		//globals.dependencyData[file] = (typeof deps[f]!="undefined" ? deps[f] : []).map(resolveFeature);
 		globals.dependencyData[file] = reduce((deps && typeof deps[f]!="undefined" ? deps[f] : [])
 										.map(resolveFeature)) // Resolve the features

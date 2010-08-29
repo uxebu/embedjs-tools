@@ -31,37 +31,6 @@ if (typeof console=="undefined"){
 	}
 };
 
-function endInSlash(path){
-	return path.substr(-1)!="/" ? path+"/" : path;
-};
-
-function _loadJsonFile(fileName, throwError){
-	var ret = null;
-	try{
-		eval("ret = "+readFile(fileName));
-	}catch(e){
-		if (typeof throwError=="undefined" || throwError!=false){
-			console.error("ERROR: reading file '" + fileName + "' at line "+ e.lineNumber);
-			for (var key in e){ if (typeof e[key]!="function") console.error(key, ((""+e[key]).length>100 ? e[key].substr(0, 100)+"..." : e[key])) }
-		}
-	}
-	return ret;
-};
-
-function _loadTextFile(fileName, throwError){
-	var ret = null;
-	try{
-		ret = readFile(fileName);
-	}catch(e){
-		if (typeof throwError=="undefined" || throwError!=false){
-			console.error("ERROR: reading file '" + fileName);
-			for (var key in e){ if (typeof e[key]!="function") console.error(key, ((""+e[key]).length>100 ? e[key].substr(0, 100)+"..." : e[key])) }
-		}
-	}
-	return ret;
-};
-
-
 var defaultCmdLineParameters = [
 	{
 		name:"isVerbose",
@@ -79,6 +48,45 @@ var defaultCmdLineParameters = [
 		exampleValues:["android", "iphone", "nokia-wrt", "blackberry4.6"]
 	}
 ];
+
+
+
+
+
+
+
+
+var util = {
+	endInSlash:function(path){
+		return path.substr(-1)!="/" ? path+"/" : path;
+	},
+	
+	_loadJsonFile:function(fileName, throwError){
+		var ret = null;
+		try{
+			eval("ret = "+readFile(fileName));
+		}catch(e){
+			if (typeof throwError=="undefined" || throwError!=false){
+				console.error("ERROR: reading file '" + fileName + "' at line "+ e.lineNumber);
+				for (var key in e){ if (typeof e[key]!="function") console.error(key, ((""+e[key]).length>100 ? e[key].substr(0, 100)+"..." : e[key])) }
+			}
+		}
+		return ret;
+	},
+	
+	_loadTextFile:function(fileName, throwError){
+		var ret = null;
+		try{
+			ret = readFile(fileName);
+		}catch(e){
+			if (typeof throwError=="undefined" || throwError!=false){
+				console.error("ERROR: reading file '" + fileName);
+				for (var key in e){ if (typeof e[key]!="function") console.error(key, ((""+e[key]).length>100 ? e[key].substr(0, 100)+"..." : e[key])) }
+			}
+		}
+		return ret;
+	}
+};
 
 
 var cmdLine = {
@@ -164,7 +172,7 @@ var config = {
 	sourceDirectory:"",
 
 	loadData:function(file){
-		this._rawData = _loadJsonFile(file);
+		this._rawData = util._loadJsonFile(file);
 		// We rely on the directory to use "/"!!! may fail on windows!
 		this.rootDirectory = file.split("/").slice(0, -1).join("/");
 	},
@@ -176,8 +184,8 @@ var config = {
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
 		var platform = params.platform || defaults.platform;
-		this.platformFile = endInSlash(this.rootDirectory + "/" + d.paths.platforms) + platform + ".json";
-		this.sourceDirectory = endInSlash(this.rootDirectory + "/" + d.paths.source);
+		this.platformFile = util.endInSlash(this.rootDirectory + "/" + d.paths.platforms) + platform + ".json";
+		this.sourceDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.source);
 	},
 	
 	_getBoolean:function(value){
