@@ -31,18 +31,6 @@ if (typeof console=="undefined"){
 	}
 };
 
-function handleParams(args){
-	function showHelpText(){
-		print(params._help.join("\n"));
-		quit();
-	};
-	if (args.length<2){
-		showHelpText();
-	} else {
-		prepareParams();
-	}
-};
-
 function endInSlash(path){
 	return path.substr(-1)!="/" ? path+"/" : path;
 };
@@ -74,8 +62,71 @@ function _loadTextFile(fileName, throwError){
 };
 
 
+var defaultCmdLineParameters = [
+	{
+		name:"isVerbose",
+		help:"Shall debug messages be shown?",
+		exampleValues:["true", "yes", "false", "no"]
+	},
+	{
+		name:"profile",
+		help:"The set of features that shall be built for.",
+		exampleValues:["kitchensink", "oo-only"]
+	},
+	{
+		name:"platform",
+		help:"The platform to build for.",
+		exampleValues:["android", "iphone", "nokia-wrt", "blackberry4.6"]
+	}
+];
+
+
 var cmdLine = {
-	parseParams:function(params){
+	
+	parameters:{},
+	
+	config:{},
+	
+	setup:function(args, config){
+		// summary: Call this first, to verify required params and print help, etc.
+		// args: Array The parameters passed to this script.
+		// config: Object The configuration of how to call the command.
+		this.parameters = this._parseParameters(args);
+		this.config = config;
+		// Sort the parameters first by "required=true" and then by name.
+		this.config.parameters.sort(function(a,b){ return a.required!=b.required ? (a.required?-1:1) : (a.name>b.name) });
+		var errors = {
+			missingParameters:[]
+		};
+		for (var i=0, l=config.parameters.length, p; i<l; i++){
+			p = config.parameters[i];
+			if (p.required && typeof this.parameters[p.name]=="undefined"){
+				errors.missingParameters.push(p.name);
+			}
+		}
+		
+		if (errors.missingParameters.length){
+			console.error("ERROR, Missing parameter!\nThe following parameter(s) are required to run this command:\n", "  "+ errors.missingParameters.join("\n  "));
+			console.error();
+			this.printHelp();
+			quit();
+		}
+	},
+	
+	printHelp:function(){
+		var params = this.config.parameters;
+		for (var i=0, l=params.length, p; i<l; i++){
+			p = params[i];
+			console.error("  "  + p.name + (p.required?" - This parameter is required!":""));
+			console.error("    "  + p.help);
+			console.error("    Example usages:");
+			for (var j=0, l1=p.exampleValues.length; j<l1; j++){
+				console.error("      " + p.name + "=" + p.exampleValues[j]);
+			}
+		}
+	},
+	
+	_parseParameters:function(params){
 		// summary: Take apart the params and return key-value pairs.
 		var ret = {};
 		for (var i=0, l=params.length, p; i<l; i++){
@@ -121,7 +172,7 @@ var config = {
 	setValues:function(params){
 		var d = this._rawData;
 		var defaults = d.defaults;
-		this.isVerbose = d.isVerbose;
+		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : this._getBoolean(params.isVerbose);
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
 		var platform = params.platform || defaults.platform;
@@ -129,4 +180,8 @@ var config = {
 		this.sourceDirectory = endInSlash(this.rootDirectory + "/" + d.paths.source);
 	},
 	
+	_getBoolean:function(value){
+		var falseValues = ["0", "false", "no", "null"];
+		return falseValues.indexOf(value)!=-1 ? false : true;
+	},
 }
