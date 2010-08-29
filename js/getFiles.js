@@ -15,4 +15,5 @@ config.setValues(cmdLine.parameters);
 load(_jsToolsPath + "/fileList.js");
 
 // Output
-print(config.sourceDirectory + fileList.get().join(" "+config.sourceDirectory));
+var files = fileList.get(config.platformFile, config.features, config.sourceDirectory);
+print(config.sourceDirectory + files.join(" "+config.sourceDirectory));

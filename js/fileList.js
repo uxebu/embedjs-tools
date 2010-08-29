@@ -5,15 +5,18 @@ var fileList = {
 	_dependencyData:{}, // Indexed by the directory where the __deps__.js file was loaded from, so we dont load them multiple times.
 	_modulesAdded:{},
 	
-	get:function(){
+	sourceDirectory:"",
+	
+	get:function(platformFile, features, sourceDirectory){
 		// summary:
 		// 		Load the platform JSON file (like Android.json) which contains all the features mapped to the exact js files.
 		// description:
 		// 		If features are given resolve teh dependencies and concat the files resulting form that.
-		var modules = util._loadJsonFile(config.platformFile);
+		this.sourceDirectory = sourceDirectory;
+		var modules = util._loadJsonFile(platformFile);
 		this._modules = modules;
 		var files = [];
-		if (config.features.length==0){
+		if (features.length==0){
 			for (var m in modules){
 				console.log("Adding feature:     ", m);
 				var moduleFiles = modules[m].map(util.hitch(this, "resolveDeps"))
@@ -22,10 +25,10 @@ var fileList = {
 				this._modulesAdded[m] = true;
 			}
 		} else {
-			for (var i=0, l=config.features.length, f; i<l; i++){
-				var f = config.features[i];
+			for (var i=0, l=features.length, f; i<l; i++){
+				var f = features[i];
 				if (typeof modules[f]=="undefined"){
-					console.error("ERROR: Feature '" + f + "' not defined in '" + config.platformFile + "'. ");
+					console.error("ERROR: Feature '" + f + "' not defined in '" + platformFile + "'. ");
 					console.error("Make sure (or create) the feature exists or you may have a typo in the feature name.");
 					console.error("Giving up :(\n\n");
 					quit();
@@ -91,7 +94,7 @@ var fileList = {
 		if (typeof this._dependencyData[file]=="undefined"){
 			var path = file.split("/");
 			var f = path.pop(); // The filename e.g. "declare.js"
-			var deps = util._loadJsonFile(config.sourceDirectory + (path.length?path.join("/"):"") + "/dependencies.json", false);
+			var deps = util._loadJsonFile(this.sourceDirectory + (path.length?path.join("/"):"") + "/dependencies.json", false);
 			//this._dependencyData[file] = (typeof deps[f]!="undefined" ? deps[f] : []).map(resolveFeature);
 			this._dependencyData[file] = this._reduce((deps && typeof deps[f]!="undefined" ? deps[f] : [])
 											.map(util.hitch(this, "resolveFeature"))) // Resolve the features

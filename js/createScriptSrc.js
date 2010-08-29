@@ -22,7 +22,7 @@ config.setValues(cmdLine.parameters);
 load(_jsToolsPath + "/fileList.js");
 
 // Output
-var files = fileList.get();
+var files = fileList.get(config.platformFile, config.features, config.sourceDirectory);
 var begin = '<script type="text/javascript" src="' + cmdLine.parameters.pathPrefix;
 var ending = '"></script>';
 print(begin + files.join(ending+"\n"+begin) + ending);
