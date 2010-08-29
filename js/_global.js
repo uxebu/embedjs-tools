@@ -184,6 +184,7 @@ var config = {
 	// The list of features, just some strings that are needed to resolve the deps.
 	features:[],
 	
+	platformsDirectory:"",
 	platformFile:"",
 	
 	sourceDirectory:"",
@@ -200,9 +201,16 @@ var config = {
 		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : this._getBoolean(params.isVerbose);
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
-		var platform = params.platform || defaults.platform;
-		this.platformFile = util.endInSlash(this.rootDirectory + "/" + d.paths.platforms) + platform + ".json";
+		this.setValue("platform", params.platform || defaults.platform);
 		this.sourceDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.source);
+	},
+	
+	setValue:function(key, value){
+		var d = this._rawData;
+		if (key=="platform"){
+			this.platformsDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.platforms);
+			this.platformFile = this.platformsDirectory + value + ".json";
+		}
 	},
 	
 	_getBoolean:function(value){
