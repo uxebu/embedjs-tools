@@ -85,7 +85,11 @@ var util = {
 			}
 		}
 		return ret;
-	}
+	},
+	
+	hitch:function(scope, method){
+		return function(){ return scope[method].apply(scope, arguments || []); };
+	},
 };
 
 
