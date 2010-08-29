@@ -12,7 +12,7 @@ config.loadData(args[1]);
 config.setValues(cmdLine.parameters);
 //console.log('config = ', config);
 
-load(_jsToolsPath + "/_getFiles.js");
+load(_jsToolsPath + "/fileList.js");
 
 // Output
-print(config.sourceDirectory+main().join(" "+config.sourceDirectory));
+print(config.sourceDirectory + fileList.get().join(" "+config.sourceDirectory));

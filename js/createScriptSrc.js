@@ -19,10 +19,10 @@ config.loadData(args[1]);
 config.setValues(cmdLine.parameters);
 //console.log('config = ', config);
 
-load(_jsToolsPath + "/_getFiles.js");
+load(_jsToolsPath + "/fileList.js");
 
 // Output
-var files = main();
+var files = fileList.get();
 var begin = '<script type="text/javascript" src="' + cmdLine.parameters.pathPrefix;
 var ending = '"></script>';
 print(begin + files.join(ending+"\n"+begin) + ending);
