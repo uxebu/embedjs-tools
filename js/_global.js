@@ -203,6 +203,7 @@ var config = {
 		this.features = d.profiles[this.profile];
 		this.setValue("platform", params.platform || defaults.platform);
 		this.sourceDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.source);
+		this.buildDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.build);
 	},
 	
 	setValue:function(key, value){
@@ -213,8 +214,29 @@ var config = {
 		}
 	},
 	
+	getBuildFilename:function(profile, platform){
+		var d = this._rawData;
+		var fileName = d.build.fileName;
+		// Replace ${PROFILE} and ${PLATFORM}.
+		fileName = fileName.replace("${PROFILE}", profile).replace("${PLATFORM}", platform);
+		fileName = this.buildDirectory + fileName + ".js";
+		//if (d.build.generateUncompressedFiles){
+		//	fileName = fileName+".uncompressed"
+		//}
+		return fileName;
+	},
+	
 	_getBoolean:function(value){
 		var falseValues = ["0", "false", "no", "null"];
 		return falseValues.indexOf(value)!=-1 ? false : true;
 	},
-}
+};
+
+importPackage(java.io); // So we can use FileWriter.
+var file = {
+	write:function(fileName, content){
+		var f = new FileWriter(fileName);
+		f.write(content);
+		f.close();
+	},
+};
