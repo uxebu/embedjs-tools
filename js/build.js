@@ -31,8 +31,20 @@ for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	p = allPlatforms[i];
 	config.setValue("platform", p);
 	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
-	console.log("\n\nPLATOFMR:",p);
-	console.log(files);
+	var args = {
+		// Very strange way of passing the params to shrinksafe, if you know it better
+		// please fix it. Best would be importing the java class I guess and calling it directly in here
+		// ... if I have more time ... help welcome!!!!!!
+		args:[
+			"-jar",
+			_jsToolsPath +"/../shrinksafe.jar",
+		].concat(files.map(function(f){ return config.sourceDirectory + f })), // Add the full path to the js files.
+		output:""
+	};
+	runCommand("java", args);
+	//file.write(config.getBuildFilename(config.profile, p), args.output);
+console.log('config.getBuildFilename(config.profile, p) = ', config.getBuildFilename(config.profile, p));
+quit();
 }
 
 
