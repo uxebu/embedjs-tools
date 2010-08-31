@@ -31,6 +31,9 @@ for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	p = allPlatforms[i];
 	config.setValue("platform", p);
 	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
+	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
+	
+	// Compress and write file in the build directory.
 	var args = {
 		// Very strange way of passing the params to shrinksafe, if you know it better
 		// please fix it. Best would be importing the java class I guess and calling it directly in here
@@ -38,13 +41,22 @@ for (var i=0, l=allPlatforms.length, p; i<l; i++){
 		args:[
 			"-jar",
 			_jsToolsPath +"/../shrinksafe.jar",
-		].concat(files.map(function(f){ return config.sourceDirectory + f })), // Add the full path to the js files.
+		].concat(filesWithFullPath), // Add the full path to the js files.
 		output:""
 	};
 	runCommand("java", args);
-	//file.write(config.getBuildFilename(config.profile, p), args.output);
-console.log('config.getBuildFilename(config.profile, p) = ', config.getBuildFilename(config.profile, p));
-quit();
+	var buildFileNamePrefix = config.getBuildFilenamePrefix(config.profile, p);
+	file.write(buildFileNamePrefix + ".js", args.output);
+	
+	// Create uncompressed source file, if configured to do so.
+	if (config.rawData.build.generateUncompressedFiles){
+		var fileName = buildFileNamePrefix + ".uncompressed.js";
+		file.write(fileName, ""); // Make sure the empty file exists!
+		for (var j=0, l=filesWithFullPath.length; j<l; j++){
+		//for (var j=0, l=filesWithFullPath.length; j<1; j++){
+			file.appendFile(filesWithFullPath[j], fileName);
+		}
+	}
 }
 
 
