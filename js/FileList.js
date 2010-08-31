@@ -27,7 +27,8 @@ dojo.declare(
 			if (features.length==0){
 				for (var m in modules){
 					console.log("Adding feature:     ", m);
-					var moduleFiles = modules[m].map(dojo.hitch(this, "resolveDeps"))
+					var moduleFiles = [];
+					modules[f].map(dojo.hitch(this, "resolveDeps")).map(function(arr){ moduleFiles = moduleFiles.concat(arr) });
 					console.log(moduleFiles.length ? ("+++ " + moduleFiles.join(" ")) : "");
 					files = files.concat(moduleFiles);
 					this._modulesAdded[m] = true;
@@ -103,7 +104,6 @@ dojo.declare(
 				var path = file.split("/");
 				var f = path.pop(); // The filename e.g. "declare.js"
 				var deps = util._loadJsonFile(this.sourceDirectory + (path.length?path.join("/"):"") + "/dependencies.json", false);
-				//this._dependencyData[file] = (typeof deps[f]!="undefined" ? deps[f] : []).map(resolveFeature);
 				this._dependencyData[file] = this._reduce((deps && typeof deps[f]!="undefined" ? deps[f] : [])
 												.map(dojo.hitch(this, "resolveFeature"))) // Resolve the features
 												.filter(function(i){return !!i;}); // Return empty elements that map might had returned.
