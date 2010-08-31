@@ -169,13 +169,13 @@ var config = {
 	
 	// This is the config data as we read it from the config file
 	// of the project we are just building.
-	_rawData:null,
+	rawData:null,
 	
 	// Shall debug messages be shown?
 	isVerbose:false,
 	
 	// The directory where the "build-config.json" lies
-	// all paths in _rawData are relative to this directory.
+	// all paths in rawData are relative to this directory.
 	rootDirectory:"",
 	
 	// The profile we use, e.g. "kitchensink".
@@ -190,13 +190,13 @@ var config = {
 	sourceDirectory:"",
 
 	loadData:function(file){
-		this._rawData = util._loadJsonFile(file);
+		this.rawData = util._loadJsonFile(file);
 		// We rely on the directory to use "/"!!! may fail on windows!
 		this.rootDirectory = file.split("/").slice(0, -1).join("/");
 	},
 	
 	setValues:function(params){
-		var d = this._rawData;
+		var d = this.rawData;
 		var defaults = d.defaults;
 		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : this._getBoolean(params.isVerbose);
 		this.profile = params.profile || defaults.profile;
@@ -207,23 +207,19 @@ var config = {
 	},
 	
 	setValue:function(key, value){
-		var d = this._rawData;
+		var d = this.rawData;
 		if (key=="platform"){
 			this.platformsDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.platforms);
 			this.platformFile = this.platformsDirectory + value + ".json";
 		}
 	},
 	
-	getBuildFilename:function(profile, platform){
-		var d = this._rawData;
-		var fileName = d.build.fileName;
+	getBuildFilenamePrefix:function(profile, platform){
+		var ret = this.rawData.build.fileName;
 		// Replace ${PROFILE} and ${PLATFORM}.
-		fileName = fileName.replace("${PROFILE}", profile).replace("${PLATFORM}", platform);
-		fileName = this.buildDirectory + fileName + ".js";
-		//if (d.build.generateUncompressedFiles){
-		//	fileName = fileName+".uncompressed"
-		//}
-		return fileName;
+		ret = ret.replace("${PROFILE}", profile).replace("${PLATFORM}", platform);
+		ret = this.buildDirectory + ret;
+		return ret;
 	},
 	
 	_getBoolean:function(value){
@@ -232,8 +228,24 @@ var config = {
 	},
 };
 
-importPackage(java.io); // So we can use FileWriter.
+importPackage(java.io); // So we can use FileWriter, FileReader.
+importPackage(java.util);
 var file = {
+	
+	appendFile:function(fromFileName, toFileName){
+		var r = new Scanner(new FileReader(fromFileName));
+		var w = new FileWriter(toFileName, true); // 2nd param true, means append new stuff.
+		w.write("\n\n\n/*********FILE**********\n"
+				+ fromFileName.replace(config.rootDirectory, "")
+				+ "\n********************/\n\n\n");
+		var text;
+		// repeat until all lines is read
+		while (r.hasNextLine()){
+			w.write(r.nextLine()+"\n");
+		}
+		w.close(); // Make sure to flush, thats what close() does, otherwise we loose lines :).
+	},
+	
 	write:function(fileName, content){
 		var f = new FileWriter(fileName);
 		f.write(content);
