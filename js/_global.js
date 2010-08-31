@@ -268,4 +268,8 @@ var file = {
 		f.write(content);
 		f.close();
 	},
+	
+	exists:function(fileName){
+		return new File(fileName).exists();
+	},
 };
