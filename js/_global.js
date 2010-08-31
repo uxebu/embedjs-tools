@@ -164,6 +164,11 @@ var cmdLine = {
 		}
 	},
 	
+	getBoolean:function(value){
+		var falseValues = ["0", "false", "no", "null"];
+		return falseValues.indexOf(value)!=-1 ? false : true;
+	},
+	
 	_parseParameters:function(params){
 		// summary: Take apart the params and return key-value pairs.
 		var ret = {};
@@ -215,7 +220,7 @@ var config = {
 	setValues:function(params){
 		var d = this.rawData;
 		var defaults = d.defaults;
-		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : this._getBoolean(params.isVerbose);
+		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : cmdLine.getBoolean(params.isVerbose);
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
 		this.setValue("platform", params.platform || defaults.platform);
@@ -237,11 +242,6 @@ var config = {
 		ret = ret.replace("${PROFILE}", profile).replace("${PLATFORM}", platform);
 		ret = this.buildDirectory + ret;
 		return ret;
-	},
-	
-	_getBoolean:function(value){
-		var falseValues = ["0", "false", "no", "null"];
-		return falseValues.indexOf(value)!=-1 ? false : true;
 	},
 };
 
