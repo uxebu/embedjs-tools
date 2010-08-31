@@ -4,7 +4,13 @@ load(_jsToolsPath + "/_global.js");
 
 // Command config
 cmdLine.setup(args.slice(2), {
-	parameters:defaultCmdLineParameters
+	parameters:defaultCmdLineParameters.concat([
+		{
+			name:"platforms",
+			help:"A comma-separated list of platforms you want to build for, if not given the defaults are used.",
+			exampleValues:["android", "ios,android,blackberry"]
+		}
+	])
 });
 
 // Handle config stuff
@@ -16,17 +22,40 @@ load(_jsToolsPath + "/FileList.js");
 
 // Output
 
-// Find all platform files.
-importPackage(java.io); // So we can use File.
-var files = new File(config.platformsDirectory).list();
+//
+//	Find out the platforms we want to build for.
+//	1) Either they are given as the parameter "platforms" or
+//	2) we search the platformsDirectory for all the ".json" files and
+//	use them.
+//
 var allPlatforms = [];
-for (var i=0, l=files.length, f; i<l; i++){
-	f = ""+files[i]; // By default Java doesnt give us a string :( - make it one
-	if (f.substr(-5)==".json"){
-		allPlatforms.push(f.substr(0, f.length-5));
+if (cmdLine.parameters.platforms){ // 1)
+	var _platforms = cmdLine.parameters.platforms.split(",");
+	for (var i=0, l=_platforms.length, p; i<l; i++){
+		p = _platforms[i];
+		if (file.exists(config.platformsDirectory + p + ".json")){
+			allPlatforms.push(p);
+		} else {
+			console.error("Warning: Platform file '" + p + ".json' doesn't exist (should be in '" + config.platformsDirectory + "').");
+		}
+	}
+} else { // 2) 
+	// Find all platform files.
+	importPackage(java.io); // So we can use File.
+	var files = new File(config.platformsDirectory).list();
+	for (var i=0, l=files.length, f; i<l; i++){
+		f = ""+files[i]; // By default Java doesnt give us a string :( - make it one
+		if (f.substr(-5)==".json"){
+			allPlatforms.push(f.substr(0, f.length-5));
+		}
 	}
 }
 
+//
+//	Go through all the platforms and create the build.
+//	That means run the set of files through a compressor and
+//	create the uncompressed files, using some simple java stuff, if configured so.
+//
 for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	p = allPlatforms[i];
 	config.setValue("platform", p);
@@ -52,15 +81,8 @@ for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	if (config.rawData.build.generateUncompressedFiles){
 		var fileName = buildFileNamePrefix + ".uncompressed.js";
 		file.write(fileName, ""); // Make sure the empty file exists!
-		for (var j=0, l=filesWithFullPath.length; j<l; j++){
-		//for (var j=0, l=filesWithFullPath.length; j<1; j++){
+		for (var j=0, l1=filesWithFullPath.length; j<l1; j++){
 			file.appendFile(filesWithFullPath[j], fileName);
 		}
 	}
 }
-
-
-
-
-
-//print(config.sourceDirectory + fileList.get().join(" "+config.sourceDirectory));
