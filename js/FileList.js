@@ -66,11 +66,8 @@ dojo.declare(
 				var data = this._modules;
 				if (f===null){
 					// If the feature is only "oo" then we use ALL files given inside "oo".
-					ret = data[ns];
-					for (var i=0, l=ret.length; i<l; i++){
-						this.resolveDeps(ret[i], function(files){
-							ret = ret.concat(files);
-						});
+					for (var i=0, l=data[ns].length; i<l; i++){
+						ret = this.resolveDeps(data[ns][i]);
 					}
 				} else {
 					// A features like "oo-declare" means we only want the features inside "oo"
@@ -78,10 +75,7 @@ dojo.declare(
 					for (var j=0, l=data[ns].length, file; j<l; j++){
 						file = data[ns][j];
 						if (file.indexOf(f)!=-1){
-							ret.push(file);
-							this.resolveDeps(file, function(files){
-								ret = ret.concat(files);
-							});
+							ret = ret.concat(this.resolveDeps(file));
 						}
 					}
 				}
@@ -104,6 +98,7 @@ dojo.declare(
 				var path = file.split("/");
 				var f = path.pop(); // The filename e.g. "declare.js"
 				var deps = util._loadJsonFile(this.sourceDirectory + (path.length?path.join("/"):"") + "/dependencies.json", false);
+				// Let's resolve the deps for each of the files listed in the dependencies.json file.
 				this._dependencyData[file] = this._reduce((deps && typeof deps[f]!="undefined" ? deps[f] : [])
 												.map(dojo.hitch(this, "resolveFeature"))) // Resolve the features
 												.filter(function(i){return !!i;}); // Return empty elements that map might had returned.
