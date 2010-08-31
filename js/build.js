@@ -9,6 +9,11 @@ cmdLine.setup(args.slice(2), {
 			name:"platforms",
 			help:"A comma-separated list of platforms you want to build for, if not given the defaults are used.",
 			exampleValues:["android", "ios,android,blackberry"]
+		},
+		{
+			name:"uncompressed",
+			help:"Shall the uncompressed files be generated too? This overrides the value from the config file.",
+			exampleValues:["true", "yes", "false", "no"]
 		}
 	])
 });
@@ -56,6 +61,7 @@ if (cmdLine.parameters.platforms){ // 1)
 //	That means run the set of files through a compressor and
 //	create the uncompressed files, using some simple java stuff, if configured so.
 //
+var uncompressed = typeof cmdLine.parameters.uncompressed=="undefined" ? config.rawData.build.generateUncompressedFiles : cmdLine.getBoolean(cmdLine.parameters.uncompressed);
 for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	p = allPlatforms[i];
 	config.setValue("platform", p);
@@ -63,6 +69,7 @@ for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
 	
 	// Compress and write file in the build directory.
+// TODO enable hooking other compressors in here ...
 	var args = {
 		// Very strange way of passing the params to shrinksafe, if you know it better
 		// please fix it. Best would be importing the java class I guess and calling it directly in here
@@ -75,11 +82,13 @@ for (var i=0, l=allPlatforms.length, p; i<l; i++){
 	};
 	runCommand("java", args);
 	var buildFileNamePrefix = config.getBuildFilenamePrefix(config.profile, p);
+	print("Writing built file for '" + p + "' to " + buildFileNamePrefix.replace(config.rootDirectory, "") + ".js");
 	file.write(buildFileNamePrefix + ".js", args.output);
 	
 	// Create uncompressed source file, if configured to do so.
-	if (config.rawData.build.generateUncompressedFiles){
+	if (uncompressed){
 		var fileName = buildFileNamePrefix + ".uncompressed.js";
+		print("Writing uncompressed file for '" + p + "' to " + fileName.replace(config.rootDirectory, ""));
 		file.write(fileName, ""); // Make sure the empty file exists!
 		for (var j=0, l1=filesWithFullPath.length; j<l1; j++){
 			file.appendFile(filesWithFullPath[j], fileName);
