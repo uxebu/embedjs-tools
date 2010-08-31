@@ -46,6 +46,10 @@ var defaultCmdLineParameters = [
 		name:"platform",
 		help:"The platform to build for.",
 		exampleValues:["android", "iphone", "nokia-wrt", "blackberry4.6"]
+	},
+	{
+		name:"help",
+		help:"Print the help for this command."
 	}
 ];
 
@@ -130,6 +134,10 @@ var cmdLine = {
 			}
 		}
 		
+		if (this.parameters.help){
+			this.printHelp();
+			quit();
+		}
 		if (errors.missingParameters.length){
 			console.error("ERROR, Missing parameter!\nThe following parameter(s) are required to run this command:\n", "  "+ errors.missingParameters.join("\n  "));
 			console.error();
@@ -144,9 +152,14 @@ var cmdLine = {
 			p = params[i];
 			console.error("  "  + p.name + (p.required?" - This parameter is required!":""));
 			console.error("    "  + p.help);
+			var numExampleValues = typeof p.exampleValues=="undefined" ? 0 : p.exampleValues.length;
 			console.error("    Example usages:");
-			for (var j=0, l1=p.exampleValues.length; j<l1; j++){
-				console.error("      " + p.name + "=" + p.exampleValues[j]);
+			if (numExampleValues){
+				for (var j=0; j<numExampleValues; j++){
+					console.error("      " + p.name + "=" + p.exampleValues[j]);
+				}
+			} else {
+				console.error("      " + p.name);
 			}
 		}
 	},
@@ -157,7 +170,11 @@ var cmdLine = {
 		for (var i=0, l=params.length, p; i<l; i++){
 			p = params[i];
 			var valueStart = p.indexOf("="); // Find the "="
-			ret[p.substr(0, valueStart)] = p.substr(valueStart+1);
+			if (valueStart==-1){
+				ret[p] = true;
+			} else {
+				ret[p.substr(0, valueStart)] = p.substr(valueStart+1);
+			}
 		}
 		return ret;
 	}
