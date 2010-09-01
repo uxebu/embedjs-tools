@@ -13,22 +13,29 @@ Features
 ========
 
 A build in embedJS is seen as a set of features (the so called profiles [might not be good naming]), e.g. the "kitchensink" is made up out of the following features:
+
 	base,array,connect,deferred,destroy,html,json,jsonp,lang,xhr,oo,uri,query
+
 The short summary about what a features is:
-1) a feature directly refers to one or multiple file(s) that implement it
+
+#) a feature directly refers to one or multiple file(s) that implement it
    e.g. "connect" is implemented in "src/connect/connect.js" and "src/connect/event.js"
-2) a feature may have nothing to do with the namespace that it is implemented in
+#) a feature may have nothing to do with the namespace that it is implemented in
    e.g. the feature "oo" (for object orientation) is implemented in the files "src/oo/declare.js", "src/oo/delegate.js", "src/oo/extend.js", if you know dojo, you know that this implements the functions "dojo.declare", "dojo.delegate", "dojo.extend".
    You see that the feature named "oo" has nothing to do with the function/method names and the final namespace in JavaScript!
    To underline the difference in feature names and JS namespaces the features are not separated by dots, like namespaces, but by dashed, e.g. "oo-declare".
+
 
 Platforms
 =========
 
 If you look at a feature like "query" (the query engine) than it will become very quickly obvious that a feature may be implemented differently for each platform. Because some platforms may provide "document.querySelectorAll()", others might not, one wants to use sizzle, another acme as the query engine - it's the authors choice. Allowing the author to choose is exactly how the different platforms are implemented too. A feature has a mapping to which file(s) implement it - per platform!!!
+
 Examples might show this best:
 
-android.json:
+**android.json**
+
+::
 
 	...
 	"query":[
@@ -38,7 +45,9 @@ android.json:
 	
 for android the implementation for the feature "query" can be found in the given file. For iOS the same implementation is used in this case.
 
-vodafone-apps-manager2.2.json:
+**vodafone-apps-manager2.2.json**
+
+::
 
 	...
 	"query": [
