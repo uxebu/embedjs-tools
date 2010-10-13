@@ -67,7 +67,7 @@ dojo.declare(
 				if (f===null){
 					// If the feature is only "oo" then we use ALL files given inside "oo".
 					for (var i=0, l=data[ns].length; i<l; i++){
-						ret = this.resolveDeps(data[ns][i]);
+						ret.push(this.resolveDeps(data[ns][i]));
 					}
 				} else {
 					// A features like "oo-declare" means we only want the features inside "oo"
