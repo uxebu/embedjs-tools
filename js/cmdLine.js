@@ -5,7 +5,6 @@ var cmdLine = {
 	config:{},
 	
 	setup:function(args, config){
-for(var i in config)print(i);
 		// summary: Call this first, to verify required params and print help, etc.
 		// args: Array The parameters passed to this script.
 		// config: Object The configuration of how to call the command.
