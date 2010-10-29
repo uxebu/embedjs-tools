@@ -1,6 +1,11 @@
 var args = Array.prototype.slice.call(arguments);
 var _jsToolsPath = environment["user.dir"] + "/" + args[0];
 load(_jsToolsPath + "/_global.js");
+load(_jsToolsPath + "/util.js");
+load(_jsToolsPath + "/dojo.js");
+load(_jsToolsPath + "/cmdLine.js");
+load(_jsToolsPath + "/config.js");
+load(_jsToolsPath + "/file.js");
 
 // Command config
 cmdLine.setup(args.slice(2), {
@@ -21,7 +26,6 @@ cmdLine.setup(args.slice(2), {
 // Handle config stuff
 config.loadData(args[1]);
 config.setValues(cmdLine.parameters);
-//console.log('config = ', config);
 
 load(_jsToolsPath + "/FileList.js");
 
