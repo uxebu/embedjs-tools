@@ -1,11 +1,11 @@
 var args = Array.prototype.slice.call(arguments);
 var _jsToolsPath = environment["user.dir"] + "/" + args[0];
-load(_jsToolsPath + "/_global.js");
-load(_jsToolsPath + "/util.js");
-load(_jsToolsPath + "/dojo.js");
-load(_jsToolsPath + "/cmdLine.js");
-load(_jsToolsPath + "/config.js");
-load(_jsToolsPath + "/file.js");
+load(_jsToolsPath + "/lib/_global.js");
+load(_jsToolsPath + "/lib/util.js");
+load(_jsToolsPath + "/lib/dojo.js");
+load(_jsToolsPath + "/lib/cmdLine.js");
+load(_jsToolsPath + "/lib/config.js");
+load(_jsToolsPath + "/lib/file.js");
 
 // Command config
 cmdLine.setup(args.slice(2), {
@@ -27,7 +27,7 @@ cmdLine.setup(args.slice(2), {
 config.loadData(args[1]);
 config.setValues(cmdLine.parameters);
 
-load(_jsToolsPath + "/FileList.js");
+load(_jsToolsPath + "/lib/FileList.js");
 
 // Output
 
@@ -38,6 +38,14 @@ load(_jsToolsPath + "/FileList.js");
 //	use them.
 //
 var allPlatforms = [];
+var cp = cmdLine.parameters;
+if (cp.platform){
+	if (cp.platforms){
+		cp.platforms.push(cp.platform);
+	} else {
+		cp.platforms = cp.platform;
+	}
+}
 if (cmdLine.parameters.platforms){ // 1)
 	var _platforms = cmdLine.parameters.platforms.split(",");
 	for (var i=0, l=_platforms.length, p; i<l; i++){
