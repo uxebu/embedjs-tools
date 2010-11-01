@@ -26,7 +26,7 @@ load(_jsToolsPath + "/lib/FileList.js");
 // Validate the platforms given and keep working with the clean list.
 var allValidPlatforms = platform.getAllValid(cmdLine.mergeParams("platforms", "platform"), config.platformsDirectory);
 
-/*
+
 
 function renderRunTestsTpl(content, platform, isWidget){
 	// summary: Render the runTests.html.tpl for the given platform.
@@ -60,22 +60,22 @@ function writeFile(fileName, content){
 //
 //	Main
 //
-var platforms = getPlatforms(PLATFORMS_DIR);
-var tpl = readFile(RUN_TESTS_DIR+"/runTests.html.tpl");
+// TODO Currently hardcoded that the tests dir is under the root, make it configurable!?
+var tpl = readFile(config.testsDirectory + "/runTests.html.tpl");
 importPackage(java.io); // So we can use FileWriter.
-for (var i=0, l=platforms.length, p; i<l; i++){
-	p = platforms[i];
+for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
+	p = allValidPlatforms[i];
 	// Write the normal file.
-	var destFile = RUN_TESTS_DIR+"/runTests-" + p + ".html";
+	var destFile = config.testsDirectory + "/runTests-" + p + ".html";
 	print("Writing '" + destFile + "'");
 	writeFile(destFile, renderRunTestsTpl(tpl, p));
 	// Write the test file for the widget env.
-	var destFile = RUN_TESTS_DIR+"/runTests-widget-" + p + ".html";
+	var destFile = config.testsDirectory + "/runTests-widget-" + p + ".html";
 	print("Writing '" + destFile + "'");
 	writeFile(destFile, renderRunTestsTpl(tpl, p, true));
 }
-destFile = RUN_TESTS_DIR+"/index.html";
+destFile = config.testsDirectory + "/index.html";
 print("Writing '" + destFile + "'");
-writeFile(destFile, renderIndexTpl(platforms));
+writeFile(destFile, renderIndexTpl(allValidPlatforms));
 
 //*/
