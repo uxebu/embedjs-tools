@@ -69,6 +69,9 @@ var cmdLine = {
 		// 		it's a list and it will treat and return them as a list.
 		var valueOne = this.parameters[arrayParam];
 		var valueTwo = this.parameters[mergeIn];
+		if (!valueOne && !valueTwo){
+			return undefined;
+		}
 		var ret = valueOne ? valueOne.split(",") : [];
 		if (valueTwo){
 			if (valueOne){

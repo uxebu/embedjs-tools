@@ -21,7 +21,7 @@ dojo.declare(
 			// description:
 			// 		If features are given resolve teh dependencies and concat the files resulting form that.
 			this.sourceDirectory = sourceDirectory;
-			var modules = util._loadJsonFile(platformFile);
+			var modules = this._getModules(platformFile);
 			this._modules = modules;
 			var files = [];
 			if (features.length==0){
@@ -104,6 +104,27 @@ dojo.declare(
 												.filter(function(i){return !!i;}); // Return empty elements that map might had returned.
 			}
 			return this._dependencyData[file].concat([file]); // I don't know if we want to KNOW here that we have to concat "file" too.
+		},
+		
+		_getModules:function(platformFile){
+			// summary: Read all the modules from the platform file.
+			// 		This method implements the platform file to be an extension of a _base.json which lies in the same
+			// 		directory. This is a convention for now and might be refactored later, but since we implement stuff
+			// 		step by step we go for this approach now.
+//TODO splitting by / is platform specific.
+			var parts = platformFile.split("/");
+			var baseJson = parts.slice(0, -1).join("/") + "/_base.json";
+			var ret = {};
+			if (file.exists(baseJson)){
+				ret = util._loadJsonFile(baseJson);
+				overrideData = util._loadJsonFile(platformFile);
+				for (var key in overrideData){
+					ret[key] = overrideData[key];
+				}
+			} else {
+				ret = util._loadJsonFile(platformFile);
+			}
+			return ret;
 		},
 		
 		_reduce:function(arr){

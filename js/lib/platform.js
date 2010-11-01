@@ -33,14 +33,14 @@ var platform = {
 					console.error("Warning: Platform file '" + p + ".json' doesn't exist (should be in '" + platformsDirectory + "').");
 				}
 			}
-		} else { // 2) 
+		} else { // 2)
 			// Find all platform files.
 // TODO Maybe make the following into a function of the file helper object!?
 			importPackage(java.io); // So we can use File.
 			var files = new File(platformsDirectory).list();
 			for (var i=0, l=files.length, f; i<l; i++){
 				f = ""+files[i]; // By default Java doesnt give us a string :( - make it one
-				if (f.substr(-5)==".json"){
+				if (f.substr(-5)==".json" && f!="_base.json"){
 					ret.push(f.substr(0, f.length-5));
 				}
 			}
