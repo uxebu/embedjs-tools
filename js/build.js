@@ -33,7 +33,7 @@ load(_jsToolsPath + "/lib/FileList.js");
 
 // Let's merge the "platform" param if used into "platforms".
 // Validate the platforms given and keep working with the clean list.
-var allValidPlatforms = platform.getAllValid(cmdLine.mergeParams("platforms", "platform"), config.platformsDirectory);
+var allValidPlatforms = platform.getAllValid(config.platformsDirectory, cmdLine.mergeParams("platforms", "platform"));
 
 
 //

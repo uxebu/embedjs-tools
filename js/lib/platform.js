@@ -12,7 +12,7 @@ var platform = {
 		}
 	],
 	
-	getAllValid:function(platforms, platformsDirectory){
+	getAllValid:function(platformsDirectory, platforms){
 		// summary: Find out all the valid platforms, either by the given ones of by searching the platformsDirectory
 		// description: 1) Either the platforms are given as the parameter "platforms" or
 		//				2) we search the platformsDirectory for all the ".json" files and
