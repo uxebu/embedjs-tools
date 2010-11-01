@@ -22,6 +22,8 @@ var config = {
 	platformFile:"",
 	
 	sourceDirectory:"",
+	
+	testsDirectory:"",
 
 	loadData:function(file){
 		this.rawData = util._loadJsonFile(file);
@@ -39,6 +41,7 @@ var config = {
 		this.setValue("platform", params.platform || defaults.platform);
 		this.sourceDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.source);
 		this.buildDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.build);
+		this.testsDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.tests);
 	},
 	
 	setValue:function(key, value){
