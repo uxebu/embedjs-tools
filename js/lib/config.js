@@ -32,6 +32,7 @@ var config = {
 	setValues:function(params){
 		var d = this.rawData;
 		var defaults = d.defaults;
+// TODO the following line should not depend on cmdLine I think it is even obsolete, double check and fix please!!!!
 		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : cmdLine.getBoolean(params.isVerbose);
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
