@@ -39,6 +39,8 @@ load(_jsToolsPath + "/lib/FileList.js");
 //
 var allPlatforms = [];
 var cp = cmdLine.parameters;
+// We only use the parameter "platforms" (the plural!!!) in this script, as opposed to all others
+// which only use "platform". Let's convert the "platform" param if used into "platforms".
 if (cp.platform){
 	if (cp.platforms){
 		cp.platforms.push(cp.platform);
@@ -46,8 +48,8 @@ if (cp.platform){
 		cp.platforms = cp.platform;
 	}
 }
-if (cmdLine.parameters.platforms){ // 1)
-	var _platforms = cmdLine.parameters.platforms.split(",");
+if (cp.platforms){ // 1)
+	var _platforms = cp.platforms.split(",");
 	for (var i=0, l=_platforms.length, p; i<l; i++){
 		p = _platforms[i];
 		if (file.exists(config.platformsDirectory + p + ".json")){
