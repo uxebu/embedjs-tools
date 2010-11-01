@@ -1,16 +1,32 @@
+var args = Array.prototype.slice.call(arguments);
+var _jsToolsPath = environment["user.dir"] + "/" + args[0];
+load(_jsToolsPath + "/lib/_global.js");
+load(_jsToolsPath + "/lib/util.js");
+load(_jsToolsPath + "/lib/dojo.js");
+load(_jsToolsPath + "/lib/cmdLine.js");
+load(_jsToolsPath + "/lib/config.js");
+load(_jsToolsPath + "/lib/file.js");
+load(_jsToolsPath + "/lib/platform.js");
 
-var PLATFORMS_DIR = arguments[0];
-var RUN_TESTS_DIR = arguments[1];
+// Command config
+cmdLine.setup(args.slice(2), {
+	parameters:
+		defaultCmdLineParameters
+		.concat(platform.cmdLineParamsAddOn) // Add the params normally used when working on platforms stuff.
+	}
+);
 
+// Handle config stuff
+config.loadData(args[1]);
+config.setValues(cmdLine.parameters);
 
-function getPlatforms(dir){
-	var params = {output:""};
-	runCommand("ls", dir, params);
-	platforms = params.output.split("\n")
-				.map(function(i){ return i.replace(/\.json/, "") }) // Remove the extension .json.
-				.filter(function(i){ return !!i }); // Remove empty values.
-	return platforms;
-}
+load(_jsToolsPath + "/lib/FileList.js");
+
+// Let's merge the "platform" param if used into "platforms".
+// Validate the platforms given and keep working with the clean list.
+var allValidPlatforms = platform.getAllValid(cmdLine.mergeParams("platforms", "platform"), config.platformsDirectory);
+
+/*
 
 function renderRunTestsTpl(content, platform, isWidget){
 	// summary: Render the runTests.html.tpl for the given platform.
@@ -61,3 +77,5 @@ for (var i=0, l=platforms.length, p; i<l; i++){
 destFile = RUN_TESTS_DIR+"/index.html";
 print("Writing '" + destFile + "'");
 writeFile(destFile, renderIndexTpl(platforms));
+
+//*/
