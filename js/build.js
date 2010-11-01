@@ -6,22 +6,24 @@ load(_jsToolsPath + "/lib/dojo.js");
 load(_jsToolsPath + "/lib/cmdLine.js");
 load(_jsToolsPath + "/lib/config.js");
 load(_jsToolsPath + "/lib/file.js");
+load(_jsToolsPath + "/lib/platform.js");
 
 // Command config
 cmdLine.setup(args.slice(2), {
-	parameters:defaultCmdLineParameters.concat([
-		{
-			name:"platforms",
-			help:"A comma-separated list of platforms you want to build for, if not given the defaults are used.",
-			exampleValues:["android", "ios,android,blackberry"]
-		},
-		{
-			name:"uncompressed",
-			help:"Shall the uncompressed files be generated too? This overrides the value from the config file.",
-			exampleValues:["true", "yes", "false", "no"]
-		}
-	])
-});
+	parameters:
+		defaultCmdLineParameters
+		.concat(platform.cmdLineParamsAddOn) // Add the params normally used when working on platforms stuff.
+		.concat(
+			[
+				{
+					name:"uncompressed",
+					help:"Shall the uncompressed files be generated too? This overrides the value from the config file.",
+					exampleValues:["true", "yes", "false", "no"]
+				}
+			]
+		)
+	}
+);
 
 // Handle config stuff
 config.loadData(args[1]);
@@ -29,46 +31,10 @@ config.setValues(cmdLine.parameters);
 
 load(_jsToolsPath + "/lib/FileList.js");
 
-// Output
+// Let's merge the "platform" param if used into "platforms".
+// Validate the platforms given and keep working with the clean list.
+var allValidPlatforms = platform.getAllValid(cmdLine.mergeParams("platforms", "platform"), config.platformsDirectory);
 
-//
-//	Find out the platforms we want to build for.
-//	1) Either they are given as the parameter "platforms" or
-//	2) we search the platformsDirectory for all the ".json" files and
-//	use them.
-//
-var allPlatforms = [];
-var cp = cmdLine.parameters;
-// We only use the parameter "platforms" (the plural!!!) in this script, as opposed to all others
-// which only use "platform". Let's convert the "platform" param if used into "platforms".
-if (cp.platform){
-	if (cp.platforms){
-		cp.platforms.push(cp.platform);
-	} else {
-		cp.platforms = cp.platform;
-	}
-}
-if (cp.platforms){ // 1)
-	var _platforms = cp.platforms.split(",");
-	for (var i=0, l=_platforms.length, p; i<l; i++){
-		p = _platforms[i];
-		if (file.exists(config.platformsDirectory + p + ".json")){
-			allPlatforms.push(p);
-		} else {
-			console.error("Warning: Platform file '" + p + ".json' doesn't exist (should be in '" + config.platformsDirectory + "').");
-		}
-	}
-} else { // 2) 
-	// Find all platform files.
-	importPackage(java.io); // So we can use File.
-	var files = new File(config.platformsDirectory).list();
-	for (var i=0, l=files.length, f; i<l; i++){
-		f = ""+files[i]; // By default Java doesnt give us a string :( - make it one
-		if (f.substr(-5)==".json"){
-			allPlatforms.push(f.substr(0, f.length-5));
-		}
-	}
-}
 
 //
 //	Go through all the platforms and create the build.
@@ -76,8 +42,8 @@ if (cp.platforms){ // 1)
 //	create the uncompressed files, using some simple java stuff, if configured so.
 //
 var uncompressed = typeof cmdLine.parameters.uncompressed=="undefined" ? config.rawData.build.generateUncompressedFiles : cmdLine.getBoolean(cmdLine.parameters.uncompressed);
-for (var i=0, l=allPlatforms.length, p; i<l; i++){
-	p = allPlatforms[i];
+for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
+	p = allValidPlatforms[i];
 	config.setValue("platform", p);
 	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
 	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });

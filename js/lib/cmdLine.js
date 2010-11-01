@@ -57,6 +57,29 @@ var cmdLine = {
 		return falseValues.indexOf(value)!=-1 ? false : true;
 	},
 	
+	mergeParams:function(arrayParam, mergeIn){
+		// summary: Merge two parameters' values, assume the first one is an array param.
+		// description:
+		//		It takes all possibilities into account, either parameter might be given or missing and any
+		//		combination of both.
+		// 		E.g. if the parameters "platform" and "platforms" are possible, in the end we only want to
+		// 		work with a list of platforms. But maybe for legacy reasons both have to be supported.
+		// 		This function takes care of returning one array containing all the values of both of the
+		// 		parameters. It assumes the default behavior for the values, which is: if it contains a ","
+		// 		it's a list and it will treat and return them as a list.
+		var valueOne = this.parameters[arrayParam];
+		var valueTwo = this.parameters[mergeIn];
+		var ret = valueOne ? valueOne.split(",") : [];
+		if (valueTwo){
+			if (valueOne){
+				ret.push(valueTwo);
+			} else {
+				ret = [valueTwo];
+			}
+		}
+		return ret;
+	},
+	
 	_parseParameters:function(params){
 		// summary: Take apart the params and return key-value pairs.
 		var ret = {};
