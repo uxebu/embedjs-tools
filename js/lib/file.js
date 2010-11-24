@@ -24,5 +24,5 @@ var file = {
 	
 	exists:function(fileName){
 		return new File(fileName).exists();
-	},
+	}
 };
