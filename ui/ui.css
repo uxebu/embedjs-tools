@@ -1,0 +1,49 @@
+.indented {
+	padding-left: 20px;
+}
+
+html, 
+body,
+#mother {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+#featureList {
+	width: 200px;
+	overflow: auto;
+}
+
+/*****************/
+/* Platform Pane */
+/*****************/
+
+.platformDetails {
+	padding: 0 10px 5px 20px;
+	display: inline-block;
+	border-left: solid 1px #808080;
+}
+.platformDetails.first {
+	border: none;
+	padding-left: 5px;
+}
+#platformsPane {
+	display: -moz-box;
+	width: 100%;
+	height: 100%;
+}
+.featureDetails div {
+	padding-left: 10px;
+}
+.included {
+	color: #808080;
+}
+.platformSummary {
+	padding: 10px;
+	margin-top: 10px;
+	margin-right: 10px;
+	border-top: solid 1px #808080;
+}
