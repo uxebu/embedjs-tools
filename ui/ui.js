@@ -13,6 +13,10 @@ var ebti = {
 	
 	buildDetails: {},
 	
+	currentProfile: [],
+	
+	currentProfileName: '',
+	
 	loadConfigFromInput: function(){
 		// reset
 		this.platforms = {};
@@ -109,7 +113,7 @@ var ebti = {
 			if(feature.split('-').length > 1){
 				clazz += " indented";
 			}
-			list += '<div class="'+clazz+'"><input type="checkbox" id="feature'+feature+'"><label for="feature'+feature+'">'+feature+'</label></div>';
+			list += '<div class="'+clazz+'"><input type="checkbox" id="feature'+feature+'" onchange="ebti.updateFeatures();"><label for="feature'+feature+'">'+feature+'</label></div>';
 		}, this);
 		dojo.byId('featureList').innerHTML = list;
 	},
@@ -126,13 +130,25 @@ var ebti = {
 	
 	preSelectProfile: function(){
 		var select = dojo.byId('profileSelect');
-		var profileName = this.currentProfileName = select.options[select.selectedIndex].value;
-		var profile = this.currentProfile = this.buildConfig.profiles[profileName];
+		this.currentProfileName = select.options[select.selectedIndex].value;
+		this.currentProfile = this.buildConfig.profiles[this.currentProfileName];
 		
 		this.clearAllFeatures();
-		dojo.map(profile, dojo.hitch(this, 'addFeature'));
-		
-		this.renderBuildDetails();
+		this.updateBuildDetails();
+	},
+	
+	updateFeatures: function(updateFeatures){
+		// obtain list
+		var list = [];
+		dojo.query('input', dojo.byId('featureList')).forEach(function(node){
+			if(node.checked){
+				list.push(node.id.substring(7));
+			}
+		});
+		console.log(list);
+		this.currentProfileName = 'custom';
+		this.currentProfile = list;
+		this.updateBuildDetails();
 	},
 	
 	addFeature: function(featureName){
@@ -151,6 +167,9 @@ var ebti = {
 			var buildSpec = a[platformName][featureName];	
 		}else{
 			var buildSpec = dojo.getObject('ebti.buildDetails.' + platformName + '.' + featureName, true); // Can't do if there's a dot somewhere :/	
+		}
+		if(buildSpec.isImplementedBy){
+			return; // feature has already been processed;
 		}
 		buildSpec.isImplementedBy = this.platforms[platformName][featureName];
 		buildSpec.requestedBy = requestedBy || '-';
@@ -233,8 +252,15 @@ var ebti = {
 		console.log(deps);
 	},
 	
+	updateBuildDetails: function(){
+		this.buildDetails = {};
+		dojo.map(this.currentProfile, dojo.hitch(this, 'addFeature'));
+		this.renderBuildDetails();
+	},
+	
 	renderBuildDetails: function(){
 		var isFirst = true;
+		dojo.byId('platformsPane').innerHTML = '';
 		dojo.forEach(this.platformNames, function(platformName){
 			var container = dojo.create('div', { className: 'platformDetails'});
 			isFirst && dojo.addClass(container, 'first');
