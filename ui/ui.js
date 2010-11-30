@@ -271,8 +271,7 @@ var ebti = {
 			for(var featureName in details){
 				var featureContainer = dojo.create('div', { className: 'featureDetails' });
 				var featureDetails = details[featureName];
-				featureContainer.innerHTML = '<h6>'+featureName+'</h6>';
-				featureContainer.title = 'Feature was requested by: '+featureDetails.requestedBy+' Feature has dependencies on: ' + featureDetails.dependsOn;
+				featureContainer.innerHTML = '<h6>'+featureName+'<div class="fDep" title="Feature has dependencies on: ' + ( featureDetails.dependsOn.length ? featureDetails.dependsOn : '-' ) + '">D</div><div class="fReq" title="Feature was requested by: '+featureDetails.requestedBy+'">R</div></h6>';
 				dojo.forEach(featureDetails.isImplementedBy, function(file){
 					var classNames = [];
 					if(dojo.indexOf(platformFiles, file) > 0){ // already there

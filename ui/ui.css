@@ -38,6 +38,13 @@ body,
 .featureDetails div {
 	padding-left: 10px;
 }
+.featureDetails h6 div {
+	float: right;
+	width: 10px;
+	height: 10px;
+	cursor:help;
+	margin: 0 2px;
+}
 .included {
 	color: #808080;
 }
