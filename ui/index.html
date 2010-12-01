@@ -18,23 +18,34 @@
 	</head>
 	<body class="claro">
 		<div id="mother" dojotype="dijit.layout.BorderContainer">
-			<div id="head" dojotype="dijit.layout.ContentPane" region="top">
-				<div id="configSelector">
-					Enter relative path to build-config.json: <input type="text" id="pathToConfig" /> <button onclick="ebti.loadConfigFromInput();">Load</button>
+			<div id="head" dojotype="dijit.layout.BorderContainer" region="top">
+				<div id="profileSettings" dojoType="dijit.layout.ContentPane" title="Profile API" selected="true" region="leading">
+					<div id="configSelector">
+						Enter relative path to build-config.json: <input type="text" id="pathToConfig" /> <button onclick="ebti.loadConfigFromInput();">Load</button>
+					</div>
+					<div>
+						Current profile name: <span id="currentProfileName">&mdash;</span>
+					</div>
+					<div>
+						Current profile's feature list: <input type="text" id="currentProfile" value="" />
+					</div>
+					<div id="profileSelector">
+						Load pre-defined profile: <span></span> <button onclick="ebti.preSelectProfile();">Load</button>
+					</div>
 				</div>
-				<div id="profileSelector">
-					Select pre-defined profile: <span></span> <button onclick="ebti.preSelectProfile();">Select</button>
+				<div id="platformSettings" dojoType="dijit.layout.ContentPane" title="Profile API" selected="true" region="center">
+					PlatformSettings
 				</div>
 			</div>
 			<div id="body" dojotype="dijit.layout.BorderContainer" region="center" design="sidebar" liveSplitters="true" splitter="true">
-				<div id="featureList" dojotype="dijit.layout.BorderContainer" region="leading">
+				<div id="featureList" dojotype="dijit.layout.ContentPane" region="leading">
 					FeatureList
 				</div>
 				<div id="detailsPane" dojotype="dijit.layout.TabContainer" region="center">
 					<div id="platformsPaneWrapper" dojoType="dijit.layout.ContentPane" title="Platform Inplementations" selected="true">
 						<div id="platformsPane"></div>
 					</div>
-					<div id="apiPane" dojoType="dijit.layout.ContentPane" title="Profile API" selected="true">
+					<div id="apiPane" dojoType="dijit.layout.ContentPane" title="Profile API">
 						apiPane
 					</div>
 				</div>

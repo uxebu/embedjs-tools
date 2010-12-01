@@ -254,6 +254,8 @@ var ebti = {
 	
 	updateBuildDetails: function(){
 		this.buildDetails = {};
+		dojo.byId('currentProfileName').innerHTML = this.currentProfileName;
+		dojo.byId('currentProfile').value = '"' + this.currentProfile.join('", "') + '"';
 		dojo.map(this.currentProfile, dojo.hitch(this, 'addFeature'));
 		this.renderBuildDetails();
 	},
