@@ -97,7 +97,7 @@ var ebti = {
 		this.renderFeatureList();
 		this.renderProfileSelector();
 		this.collectFileList();
-		
+		this.renderPlatformSettings();
 	},
 	
 	listFeatures: function(platform){
@@ -289,6 +289,36 @@ var ebti = {
 			summary.innerHTML = 'Total files: ' + platformFiles.length;
 			dojo.byId('platformsPane').appendChild(container);
 		}, this);
+	},
+	
+	renderPlatformSettings: function(){
+		var parentNode = dojo.byId('platformSettings');
+		parentNode.innerHTML = '';
+		dojo.forEach(this.platformNames, function(platformName){
+			var div = dojo.create('div', {}, parentNode);
+			dojo.create('input',{
+				'type': 'checkbox',
+				'checked': 'checked',
+				'id': 'platform' + platformName,
+				'onchange': dojo.hitch(this, 'updatePlatforms')
+			}, div);
+			dojo.create('label', {
+				'for': 'platform' + platformName,
+				'innerHTML': platformName
+			}, div);
+		}, this);
+	},
+	
+	updatePlatforms: function(){
+		var platformNames = [];
+		dojo.query('input', dojo.byId('platformSettings')).forEach(function(node){
+			if(node.checked){
+				platformNames.push(node.id.substring(8));
+			}
+		});
+		console.log(platformNames, this);
+		this.platformNames = platformNames;
+		this.updateBuildDetails();
 	}
 	
 };

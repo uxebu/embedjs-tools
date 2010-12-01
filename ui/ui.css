@@ -30,6 +30,17 @@ body,
 	width: 400px;
 }
 
+/* platform settings */
+
+#platformSettingsWrapper h6 {
+	margin: 0 0 5px 0;
+}
+
+#platformSettings div {
+	display: inline-block;
+	padding: 2px 5px;
+}
+
 /* feature list */
 
 #featureList {
@@ -41,7 +52,7 @@ body,
 /* Platform Pane */
 /*****************/
 #platformsPaneWrapper {
-	padding: 0;	
+	padding: 5px 0;	
 }
 .platformDetails {
 	padding: 0 10px;

@@ -33,8 +33,9 @@
 						Load pre-defined profile: <span></span> <button onclick="ebti.preSelectProfile();">Load</button>
 					</div>
 				</div>
-				<div id="platformSettings" dojoType="dijit.layout.ContentPane" title="Profile API" selected="true" region="center">
-					PlatformSettings
+				<div id="platformSettingsWrapper" dojoType="dijit.layout.ContentPane" title="Profile API" selected="true" region="center">
+					<h6>Select Platforms to show:</h6>
+					<div id="platformSettings">PlatformSettings</div>
 				</div>
 			</div>
 			<div id="body" dojotype="dijit.layout.BorderContainer" region="center" design="sidebar" liveSplitters="true" splitter="true">
