@@ -334,7 +334,9 @@ var ebti = {
 			name: this.currentProfileName,
 			features: this.currentProfile.join(','),
 			path: this.pathToConfig,
-			platforms: this.platformNames.join(',')
+			platforms: this.platformNames.join(','),
+			keepLines: dojo.byId('buildKeepLines').checked,
+			stripConsole: dojo.byId('buildStripConsole').checked
 		});
 		var buildDialog = new dijit.Dialog({
 			title: 'Build Window',

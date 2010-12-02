@@ -4,9 +4,11 @@ $buildName = $_GET['name'];
 $features = $_GET['features'];
 $path = $_GET['path'];
 $platforms = $_GET['platforms'];
+$keepLines = $_GET['keepLines'];
+$stripConsole = $_GET['stripConsole'];
 
 $params = array(
-	$path, $buildName, $features, $platforms
+	$path, $buildName, $features, $platforms, $keepLines, $stripConsole
 );
 
 

@@ -73,10 +73,10 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	// Setup shrinksafe params.
 	var copyright = "";
 	var optimizeType = "shrinksafe"; // TODO enable hooking other compressors in here ...
-	if(cmdLine.parameters.keepLines){
+	if(cmdLine.getBoolean(cmdLine.parameters.keepLines)){
 		optimizeType += ".keepLines";
 	}
-	var stripConsole = cmdLine.parameters.stripConsole ? "all" : "none";
+	var stripConsole = cmdLine.getBoolean(cmdLine.parameters.stripConsole) ? "all" : "none";
 	
 	compressedFileName = buildFileNamePrefix + ".js";
 	file.write(compressedFileName, ""); // Make sure the empty file exists!
