@@ -20,6 +20,9 @@ class FileServer
 			case 'getPlatforms':
 				$this->data = $this->getPlatforms();
 				break;
+			case 'getFileInfo':
+				$this->data = $this->getFileInfo();
+				break;
 			default:
 				die();
 		}
@@ -43,6 +46,24 @@ class FileServer
     	}
     	
     	return $platforms;
+	}
+	
+	function getFileInfo(){
+		$files = explode(',', $this->requests['fileList']);
+		$path = dirname(__FILE__).'/'.$this->requests['pathToSource'].'/';
+		$info = array();
+		foreach($files as $file){
+			$info[$file] = $this->_getFileStats($path.$file);
+		}
+		return $info;
+	}
+	
+	function _getFileStats($filename){
+		$stats = stat($filename);
+		return array(
+			'lines' => count(file($filename)),
+			'size' => $stats['size']
+		);
 	}
 }
 

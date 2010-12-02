@@ -23,7 +23,7 @@ var ebti = {
 		dojo.style('mother', 'visibility', 'visible');
 		this.nodeCache.configDialogWrapper = dojo.byId('configDialogWrapper');
 		var inputNode = dojo.byId('pathToConfig');
-		inputNode.value="";
+		inputNode.value="../../embedjs/";
 		dojo.connect(inputNode, 'onkeydown', this, 'onConfigKey');
 		dijit.byId('configDialog').show();
 	},
@@ -42,6 +42,10 @@ var ebti = {
 		this.getBuildConfig();
 	},
 	
+	reportLoadingState: function(msg){
+		dojo.byId('configStatusMsg').innerHTML = msg;
+	},
+	
 	getBuildConfig: function(){
 		dojo.xhrGet({
 			url: this.pathToConfig + 'build-config.json',
@@ -57,9 +61,12 @@ var ebti = {
 		// info by fetching the platform names, and
 		// set the build options as described in the
 		// config.
-		dijit.byId('configDialog').hide();
 		this.buildConfig = buildConfig;
+		
+		this.reportLoadingState('Setting build options...');
 		this.setBuildOptions();
+		
+		this.reportLoadingState('Fetching platform names...');
 		this.getPlatformNames();
 	},
 	
@@ -92,6 +99,8 @@ var ebti = {
 	onPlatformNamesLoaded: function(platformNames){
 		this.platformNames = platformNames;
 		this._platformsToLoad = platformNames.length;
+		
+		this.reportLoadingState('Loading platform data...');
 		dojo.forEach(platformNames, dojo.hitch(this, "_loadPlatform"));
 	},
 	
@@ -133,7 +142,10 @@ var ebti = {
 		
 		this.renderFeatureList();
 		this.renderProfileSelector();
+		
+		this.reportLoadingState('Fetching dependency data...');
 		this.collectFileList();
+		
 		this.renderPlatformSettings();
 	},
 	
@@ -231,6 +243,7 @@ var ebti = {
 	collectFileList: function(){
 		dojo.map(this.platformNames, dojo.hitch(this, '_collectPlatformFiles'))
 		
+		this._dependencyFilesToLoad = this.knownPaths.length;
 		// make the first round of dependency crawling
 		dojo.forEach(this.knownPaths, function(path){
 			this.fetchDependencyFile(path);
@@ -260,6 +273,30 @@ var ebti = {
 		}
 	},
 	
+	getFileStats: function(){
+		// build file array
+		var list = [];
+		for(var fileName in this.files){
+			list.push(fileName);
+		}
+		dojo.xhrGet({
+			url: 'fileserver.php?cmd=getFileInfo&pathToSource=' + this.pathToConfig + this.buildConfig.paths.source + '&fileList=' + list.join(','),
+			handleAs: 'json',
+			load: dojo.hitch(this, 'enrichFileInfo'),
+			error: function(resp){
+				console.log('error', resp);
+			}
+		});
+	},
+	
+	enrichFileInfo: function(fileInfo){
+		for(var fileName in fileInfo){
+			dojo.mixin(this.files[fileName], fileInfo[fileName]);
+		}
+		this.reportLoadingState('Reday to go!');
+		dijit.byId('configDialog').hide();
+	},
+	
 	fetchDependencyFile: function(path){
 		var pathToFile = this.pathToConfig + this.buildConfig.paths.source + '/' + path;
 		dojo.xhrGet({
@@ -281,13 +318,19 @@ var ebti = {
 						};
 					}
 				}
+				--this._dependencyFilesToLoad && this.onDependendcyFilesLoaded();
 			}),
-			error: function(){}
+			error: function(){
+				--this._dependencyFilesToLoad && this.onDependendcyFilesLoaded();
+			}
 		});
 	},
 	
-	onDependencyFileLoaded: function(deps){
-		console.log(deps);
+	onDependendcyFilesLoaded: function(){
+		delete this._dependencyFilesToLoad;
+		
+		this.reportLoadingState('Fetching file stats...');
+		this.getFileStats();
 	},
 	
 	updateBuildDetails: function(){
@@ -307,24 +350,51 @@ var ebti = {
 			isFirst = false;
 			var head = dojo.create('h2', { innerHTML: platformName}, container);
 			var details = this.buildDetails[platformName];
+			
 			var platformFiles = [];
+			var totalSize = 0;
+			var totalLines = 0;
+			
 			for(var featureName in details){
-				var featureContainer = dojo.create('div', { className: 'featureDetails' });
+				var featureContainer = dojo.create('div', { className: 'featureDetails' }, container);
 				var featureDetails = details[featureName];
-				featureContainer.innerHTML = '<h6>'+featureName+'<div class="fDep" title="Feature has dependencies on: ' + ( featureDetails.dependsOn.length ? featureDetails.dependsOn : '-' ) + '">D</div><div class="fReq" title="Feature was requested by: '+featureDetails.requestedBy+'">R</div></h6>';
+				var featureHead = dojo.create('h6', {
+					innerHTML: '<div class="featureName">' + featureName + '</div>'
+				}, featureContainer);
+				featureHead.innerHTML += '<div class="fInfo" title="Feature has dependencies on: ' + ( featureDetails.dependsOn.length ? featureDetails.dependsOn : '-' ) + '">D</div>' + 
+					'<div class="fInfo" title="Feature was requested by: '+featureDetails.requestedBy+'">R</div>';
+				var featureLines = 0;
+				var featureSize = 0;
 				dojo.forEach(featureDetails.isImplementedBy, function(file){
-					var classNames = [];
+					var classNames = ["fileDetails"];
+					var size = this.files[file].size;
+					var lines = this.files[file].lines;
 					if(dojo.indexOf(platformFiles, file) > 0){ // already there
 						classNames.push('included');
 					}else{
 						platformFiles.push(file);
+						totalSize += size;
+						totalLines += lines;
+						featureSize += size;
+						featureLines += lines
 					}
-					featureContainer.innerHTML += '<div class="'+classNames.join(' ')+'">'+file+'</div>';
+					featureContainer.appendChild(dojo._toDom('<div class="'+classNames.join(' ')+'"><div class="fileName">' + file + '</div>' +
+						'<div class="fInfo" title="File depends on: ' + (this.files[file].dependencies.length ? this.files[file].dependencies : '-' ) +'">D</div>' + 
+						'<div class="fInfo" title="Lines in file: '+lines+'">L</div>' + 
+						'<div class="fInfo" title="Filesize: '+size+'b">S</div>' + 
+					'</div>'));
 				}, this);
-				container.appendChild(featureContainer);
+				featureHead.innerHTML += '<div class="fInfo" title="Lines in feature: '+featureLines+'">L</div>' + 
+					'<div class="fInfo" title="Feature size: '+featureSize+'">S</div>';
+//				featureHead.appendChild(dojo._toDom('<div class="fInfo" title="Feature has dependencies on: ' + ( featureDetails.dependsOn.length ? featureDetails.dependsOn : '-' ) + '">D</div>' + 
+//				'<div class="fInfo" title="Feature was requested by: '+featureDetails.requestedBy+'">R</div>' + 
+//				'<div class="fInfo" title="Lines in feature: '+featureLines+'">L</div>' + 
+//				'<div class="fInfo" title="Feature size: '+featureSize+'">S</div>'));
+				
+				//container.appendChild(featureContainer);
 			}
 			var summary = dojo.create('div', { className: 'platformSummary'}, container);
-			summary.innerHTML = 'Total files: ' + platformFiles.length;
+			summary.innerHTML = 'Total files: ' + platformFiles.length + '<br />Total size: ' + totalSize + 'b<br />Total lines: ' + totalLines;
 			dojo.byId('platformsPane').appendChild(container);
 		}, this);
 	},
