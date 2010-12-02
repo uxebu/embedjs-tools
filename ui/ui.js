@@ -17,6 +17,12 @@ var ebti = {
 	
 	currentProfileName: '',
 	
+	onLoad: function(){
+		dojo.style('mother', 'visibility', 'visible');
+		dojo.byId('pathToConfig').value="";
+		dijit.byId('configDialog').show();
+	},
+	
 	loadConfigFromInput: function(){
 		// reset
 		this.platforms = {};
@@ -37,6 +43,7 @@ var ebti = {
 	},
 	
 	onBuildConfigLoaded: function(buildConfig){
+		dijit.byId('configDialog').hide();
 		this.buildConfig = buildConfig;
 		this.getPlatformNames();
 	},
@@ -160,13 +167,14 @@ var ebti = {
 	},
 	
 	_addFeatureForPlatform: function(featureName, platformName, requestedBy){
+		var buildSpec;
 		if(platformName.split('.').length > 1){ // oh noez :/
 			var a = dojo.getObject('ebti.buildDetails', true);
 			!a[platformName] && ( a[platformName] = {} );
 			!a[platformName][featureName] && ( a[platformName][featureName] = {} );
-			var buildSpec = a[platformName][featureName];	
+			buildSpec = a[platformName][featureName];	
 		}else{
-			var buildSpec = dojo.getObject('ebti.buildDetails.' + platformName + '.' + featureName, true); // Can't do if there's a dot somewhere :/	
+			buildSpec = dojo.getObject('ebti.buildDetails.' + platformName + '.' + featureName, true); // Can't do if there's a dot somewhere :/	
 		}
 		if(buildSpec.isImplementedBy){
 			return; // feature has already been processed;
@@ -319,6 +327,21 @@ var ebti = {
 		console.log(platformNames, this);
 		this.platformNames = platformNames;
 		this.updateBuildDetails();
+	},
+	
+	build: function(){
+		var query = dojo.objectToQuery({
+			name: this.currentProfileName,
+			features: this.currentProfile.join(','),
+			path: this.pathToConfig,
+			platforms: this.platformNames.join(',')
+		});
+		var buildDialog = new dijit.Dialog({
+			title: 'Build Window',
+			style: 'width: 600px;'
+		});
+		buildDialog.show();
+		buildDialog.attr('content', '<iframe style="width: 100%; height: 400px; border: solid 1px #808080; background: #E0E0E0;" src="build.php?'+query+'" />');
 	}
 	
 };

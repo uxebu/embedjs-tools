@@ -37,7 +37,12 @@ var config = {
 // TODO the following line should not depend on cmdLine I think it is even obsolete, double check and fix please!!!!
 		this.isVerbose = typeof params.isVerbose=="undefined" ? d.isVerbose : cmdLine.getBoolean(params.isVerbose);
 		this.profile = params.profile || defaults.profile;
-		this.features = d.profiles[this.profile];
+		// maybe we recieved a custom feature list
+		if(this.profile == 'custom'){
+			this.features = params.features.split(',');
+		}else{
+			this.features = d.profiles[this.profile];	
+		}
 		this.setValue("platform", params.platform || defaults.platform);
 		this.sourceDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.source);
 		this.buildDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.build);

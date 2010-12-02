@@ -12,14 +12,26 @@ body,
 	overflow: hidden;
 }
 
+#workspace {
+	visibility: hidden;
+	height: 0;
+	width: 0;
+	position: absolute;
+	overflow: hidden;
+}
+
 /* head */
 
 #head {
 	height: 140px;
 }
-#profileSettings {
-	width: 600px;
+
+#head h6 {
+	margin: 0 0 5px 0;
 }
+
+/* profile tab */
+
 #profileSettings div {
 	padding: 2px 0;
 }
@@ -30,11 +42,8 @@ body,
 	width: 400px;
 }
 
-/* platform settings */
+/* platform tab */
 
-#platformSettingsWrapper h6 {
-	margin: 0 0 5px 0;
-}
 
 #platformSettings div {
 	display: inline-block;

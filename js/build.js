@@ -1,5 +1,6 @@
 var args = Array.prototype.slice.call(arguments);
-var _jsToolsPath = environment["user.dir"] + "/" + args[0];
+// check if we got a relative or absolute path
+var _jsToolsPath = args[0][0] == '/' ? args[0] : environment["user.dir"] + "/" + args[0];
 load(_jsToolsPath + "/lib/_global.js");
 load(_jsToolsPath + "/lib/util.js");
 load(_jsToolsPath + "/lib/dojo.js");
