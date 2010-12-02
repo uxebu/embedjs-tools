@@ -7,6 +7,8 @@ FEATURES=$3
 PLATFORMS=$4
 KEEPLINES=$5
 STRIPCONSOLE=$6
+UNCOMPRESSED=$7
+VERBOSE=$8
 
 # go to tools directory
 cd ..
@@ -22,4 +24,4 @@ cd $CONFIGPATH
 echo "Invoking builder."
 echo ""
 # start the builder
-$TOOLS_DIR/build.sh profile=$BUILDNAME features=$FEATURES platforms=$PLATFORMS keepLines=$KEEPLINES stripConsole=$STRIPCONSOLE
+$TOOLS_DIR/build.sh profile=$BUILDNAME features=$FEATURES platforms=$PLATFORMS keepLines=$KEEPLINES stripConsole=$STRIPCONSOLE uncompressed=$UNCOMPRESSED isVerbose=$VERBOSE

@@ -47,9 +47,15 @@
 				</div>
 				<div id="buildSettingsWrapper" dojoType="dijit.layout.ContentPane" title="Build" selected="true" region="center">
 					<h6>Build Options:</h6>
-					<div><input type="checkbox" id="buildKeepLines" /><label for="buildKeepLines">keepLines</label></div>
-					<div><input type="checkbox" id="buildStripConsole" /><label for="buildStripConsole">stripConsole</label></div>
-					<div><button onclick="ebti.build();">build...</button></div>
+					<div class="buildSettingsBlock">
+						<input type="checkbox" id="buildKeepLines" /><label for="buildKeepLines">Keep lines</label><br />
+						<input type="checkbox" id="buildStripConsole" /><label for="buildStripConsole">Strip console.* calls</label><br />
+					</div>
+					<div class="buildSettingsBlock">
+						<input type="checkbox" id="buildUncompressed" /><label for="buildUncompressed">Keep uncompressed build files</label><br />
+						<input type="checkbox" id="buildVerbose" /><label for="buildVerbose">Verbose output during build</label>
+					</div>
+					<div><button onclick="ebti.build();">Start build process</button></div>
 				</div>
 			</div>
 			<div id="body" dojotype="dijit.layout.BorderContainer" region="center" design="sidebar" liveSplitters="true" splitter="true">

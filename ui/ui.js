@@ -24,10 +24,6 @@ var ebti = {
 	},
 	
 	loadConfigFromInput: function(){
-		// reset
-		this.platforms = {};
-		this.features = [];
-		this.files = {};
 		// get config
 		this.pathToConfig = dojo.byId('pathToConfig').value;
 		this.getBuildConfig();
@@ -43,9 +39,25 @@ var ebti = {
 	},
 	
 	onBuildConfigLoaded: function(buildConfig){
+		// We have the build config. Let's kick off
+		// collecting of needed platform/feature/dependcy
+		// info by fetching the platform names, and
+		// set the build options as described in the
+		// config.
 		dijit.byId('configDialog').hide();
 		this.buildConfig = buildConfig;
+		this.setBuildOptions();
 		this.getPlatformNames();
+	},
+	
+	setBuildOptions: function(){
+		// ugly. have to manually set defaults.
+		dojo.byId('buildUncompressed').checked = typeof this.buildConfig.build.generateUncompressedFiles == "undefined" ? true : this.buildConfig.build.generateUncompressedFiles;
+		dojo.byId('buildVerbose').checked = typeof this.buildConfig.isVerbose == "undefined" ? true : this.buildConfig.isVerbose;
+		
+		// no defaults in build config for the following two yet.
+		dojo.byId('buildKeepLines').checked = false;
+		dojo.byId('buildStripConsole').checked = true;
 	},
 	
 	getPlatformNames: function(){
@@ -244,7 +256,7 @@ var ebti = {
 						this.files[fixedFileName].dependencies = deps[fileName];
 					}
 					else{
-						console.log('    file',fixedFileName,'is not known!! Path is:', path);
+						//console.log('    file',fixedFileName,'is not known!! Path is:', path);
 						this.files[fixedFileName] = {
 							path: path,
 							dependencies: deps[fileName]
@@ -324,7 +336,6 @@ var ebti = {
 				platformNames.push(node.id.substring(8));
 			}
 		});
-		console.log(platformNames, this);
 		this.platformNames = platformNames;
 		this.updateBuildDetails();
 	},
@@ -335,8 +346,11 @@ var ebti = {
 			features: this.currentProfile.join(','),
 			path: this.pathToConfig,
 			platforms: this.platformNames.join(','),
+			// settings:
 			keepLines: dojo.byId('buildKeepLines').checked,
-			stripConsole: dojo.byId('buildStripConsole').checked
+			stripConsole: dojo.byId('buildStripConsole').checked,
+			uncompressed: dojo.byId('buildUncompressed').checked,
+			verbose: dojo.byId('buildVerbose').checked
 		});
 		var buildDialog = new dijit.Dialog({
 			title: 'Build Window',
