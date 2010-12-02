@@ -17,15 +17,28 @@ var ebti = {
 	
 	currentProfileName: '',
 	
+	nodeCache: {},
+	
 	onLoad: function(){
 		dojo.style('mother', 'visibility', 'visible');
-		dojo.byId('pathToConfig').value="";
+		this.nodeCache.configDialogWrapper = dojo.byId('configDialogWrapper');
+		var inputNode = dojo.byId('pathToConfig');
+		inputNode.value="";
+		dojo.connect(inputNode, 'onkeydown', this, 'onConfigKey');
 		dijit.byId('configDialog').show();
+	},
+	
+	onConfigKey: function(evt){
+		if(evt.keyCode == 13){
+			this.loadConfigFromInput();
+		}
 	},
 	
 	loadConfigFromInput: function(){
 		// get config
 		this.pathToConfig = dojo.byId('pathToConfig').value;
+		// toggleClass
+		this.nodeCache.configDialogWrapper.className = "configLoading";
 		this.getBuildConfig();
 	},
 	
@@ -34,7 +47,7 @@ var ebti = {
 			url: this.pathToConfig + 'build-config.json',
 			handleAs: 'json',
 			load: dojo.hitch(this, 'onBuildConfigLoaded'),
-			error: function(){ console.log('couldnt load config file'); }
+			error: dojo.hitch(this, 'onConfigLoadError')
 		});
 	},
 	
@@ -48,6 +61,11 @@ var ebti = {
 		this.buildConfig = buildConfig;
 		this.setBuildOptions();
 		this.getPlatformNames();
+	},
+	
+	onConfigLoadError: function(){
+		// toggleClass
+		this.nodeCache.configDialogWrapper.className = "configError";
 	},
 	
 	setBuildOptions: function(){
@@ -341,6 +359,9 @@ var ebti = {
 	},
 	
 	build: function(){
+		if(this.currentProfile == '' || this.currentProfile == '""' || this.platformNames.length == 0){
+			return;
+		}
 		var query = dojo.objectToQuery({
 			name: this.currentProfileName,
 			features: this.currentProfile.join(','),

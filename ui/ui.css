@@ -20,6 +20,25 @@ body,
 	overflow: hidden;
 }
 
+/* dialog */
+#configStatusMsg,
+#configErrorMsg {
+	opacity: 0;
+	text-align: center;
+}
+#configSelector {
+	opacity: 0.5;
+}
+#configErrorMsg {
+	color: red;
+}
+.configDefault #configSelector,
+.configError #configErrorMsg,
+.configError #configSelector,
+.configLoading #configStatusMsg {
+	opacity: 1;
+} 
+
 /********/
 /* Head */
 /********/
