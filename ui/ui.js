@@ -13,6 +13,8 @@ var ebti = {
 	
 	buildDetails: {},
 	
+	buildOrder: {},
+	
 	currentProfile: [],
 	
 	currentProfileName: '',
@@ -266,6 +268,11 @@ var ebti = {
 			}, this);
 		}, this);
 		buildSpec.fileList = fileList;
+		
+		if(!this.buildOrder[platformName]){
+			this.buildOrder[platformName] = [];
+		}
+		this.buildOrder[platformName] = this.buildOrder[platformName].concat(fileList);
 	},
 	
 	clearAllFeatures: function(){
