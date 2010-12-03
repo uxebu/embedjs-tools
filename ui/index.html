@@ -14,6 +14,7 @@
 			dojo.require("dijit.layout.ContentPane");
 			dojo.require("dijit.layout.TabContainer");
 			dojo.require("dijit.form.TextBox");
+			dojo.require("dijit.form.ComboBox");
 			dojo.require("dijit.Dialog");
 			
 			dojo.addOnLoad(ebti, 'onLoad');
@@ -26,7 +27,7 @@
 			<div dojoType="dijit.Dialog" id="configDialog" title="Open Existing Project" execute="alert('submitted w/args:\n' + dojo.toJson(arguments[0], true));">
 				<div id="configDialogWrapper" class="configDefault">
 					<div id="configSelector">
-						Enter relative path to build-config.json: <input type="text" id="pathToConfig" /> <button onclick="ebti.loadConfigFromInput();">Load</button>
+						Enter relative path to build-config.json: <!-- <input type="text" id="pathToConfig" /> --> <span id="pathToConfigWrapper"></span> <button onclick="ebti.loadConfigFromInput();">Load</button>
 					</div>
 					<div id="configStatusMsg">Loading config file...</div>
 					<div id="configErrorMsg">Could not load config file!</div>

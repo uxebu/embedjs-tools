@@ -22,9 +22,12 @@ var ebti = {
 	onLoad: function(){
 		dojo.style('mother', 'visibility', 'visible');
 		this.nodeCache.configDialogWrapper = dojo.byId('configDialogWrapper');
+		/*
 		var inputNode = dojo.byId('pathToConfig');
 		inputNode.value="../../embedjs/";
 		dojo.connect(inputNode, 'onkeydown', this, 'onConfigKey');
+		*/
+		this.makeComboBox();
 		dijit.byId('configDialog').show();
 	},
 	
@@ -62,6 +65,7 @@ var ebti = {
 		// set the build options as described in the
 		// config.
 		this.buildConfig = buildConfig;
+		this.storeConfigUrl(this.pathToConfig);
 		
 		this.reportLoadingState('Setting build options...');
 		this.setBuildOptions();
@@ -73,6 +77,36 @@ var ebti = {
 	onConfigLoadError: function(){
 		// toggleClass
 		this.nodeCache.configDialogWrapper.className = "configError";
+	},
+	
+	storeConfigUrl: function(url){
+		if(window.localStorage){
+			var urls = this.getStoredConfigUrls();
+			if(dojo.indexOf(urls, url) == -1){
+				urls.push(url);
+				localStorage.setItem('ebti-urls', dojo.toJson(urls));
+			}
+		}
+	},
+	
+	getStoredConfigUrls: function(){
+		var urls = [];
+		if(window.localStorage){
+			var data = localStorage.getItem('ebti-urls');
+			data && ( urls = dojo.fromJson(data) );
+		}
+		return urls;
+	},
+	
+	makeComboBox: function(){
+		var urls = this.getStoredConfigUrls();
+		var select = '<select id="pathToConfig" dojotype="dijit.form.ComboBox">';
+		dojo.forEach(urls, function(url){
+			select += '<option>'+url+'</option>';
+		});
+		select += '</select>';
+		dojo.byId('pathToConfigWrapper').innerHTML = select;
+		dojo.parser.parse(dojo.byId('pathToConfigWrapper'));
 	},
 	
 	setBuildOptions: function(){
@@ -390,6 +424,9 @@ var ebti = {
 //				'<div class="fInfo" title="Feature was requested by: '+featureDetails.requestedBy+'">R</div>' + 
 //				'<div class="fInfo" title="Lines in feature: '+featureLines+'">L</div>' + 
 //				'<div class="fInfo" title="Feature size: '+featureSize+'">S</div>'));
+				if(featureSize == 0){
+					dojo.addClass(featureContainer, 'included');
+				}
 				
 				//container.appendChild(featureContainer);
 			}
