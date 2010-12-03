@@ -272,7 +272,12 @@ var ebti = {
 		if(!this.buildOrder[platformName]){
 			this.buildOrder[platformName] = [];
 		}
-		this.buildOrder[platformName] = this.buildOrder[platformName].concat(fileList);
+		//this.buildOrder[platformName] = this.buildOrder[platformName].concat(fileList);
+		dojo.forEach(fileList, function(fileName){
+			if(dojo.indexOf(this.buildOrder[platformName], fileName) == -1){
+				this.buildOrder[platformName].push(fileName);
+			}
+		}, this);
 	},
 	
 	clearAllFeatures: function(){
@@ -376,10 +381,12 @@ var ebti = {
 	
 	updateBuildDetails: function(){
 		this.buildDetails = {};
+		this.buildOrder = {};
 		dojo.byId('currentProfileName').innerHTML = this.currentProfileName;
 		dojo.byId('currentProfile').value = '"' + this.currentProfile.join('", "') + '"';
 		dojo.map(this.currentProfile, dojo.hitch(this, 'addFeature'));
 		this.renderBuildDetails();
+		this.renderFileOrder();
 	},
 	
 	renderBuildDetails: function(){
@@ -443,6 +450,26 @@ var ebti = {
 		}, this);
 	},
 	
+	renderFileOrder: function(){
+		var pane = dojo.byId('filePane');
+		pane.innerHTML = '';
+		dojo.forEach(this.platformNames, function(platformName, i){
+			var container = dojo.create('div', { className: 'fileOrder'}, pane);
+			dojo.create('h2', { innerHTML: platformName}, container);
+			dojo.toggleClass(container, 'first', i < 1);
+			var listContainer = dojo.create('div', {className: 'fileOrderList'}, container);
+			dojo.map(this.buildOrder[platformName], function(fileName){
+				dojo.create('div', { innerHTML: fileName }, listContainer);
+			}, this);
+			dojo.create('button', {
+				innerHTML: 'Generate script tags',
+				onclick: dojo.hitch(this, function(){
+					this.generateScriptTags(platformName);
+				})
+			}, container);
+		}, this);
+	},
+	
 	renderPlatformSettings: function(){
 		var parentNode = dojo.byId('platformSettings');
 		parentNode.innerHTML = '';
@@ -470,6 +497,22 @@ var ebti = {
 		});
 		this.platformNames = platformNames;
 		this.updateBuildDetails();
+	},
+	
+	generateScriptTags: function(platformName){
+		console.log('generate for: ', platformName);
+		var content = '<textarea readOnly="true" style="width: 600px; height: 400px;">\n';
+		dojo.map(this.buildOrder[platformName], function(fileName){
+			content += '<script type="text/javascript" src="' + this.buildConfig.paths.source + '/' + fileName + '"></script>' + "\n";
+		}, this);
+		content += '</textarea>';
+		
+		if(!this.scriptTagDialog){
+			this.scriptTagDialog = new dijit.Dialog();
+		}
+		this.scriptTagDialog.setContent(content);
+		this.scriptTagDialog.titleNode.innerHTML = 'Script Tags for ' + platformName;
+		this.scriptTagDialog.show();
 	},
 	
 	build: function(){
