@@ -141,10 +141,12 @@ var ebti = {
 	},
 	
 	_loadPlatform: function(platformName){
+		console.log('-- fetching ', platformName);
 		dojo.xhrGet({
 			url: this.pathToConfig + this.buildConfig.paths.platforms + '/' + platformName + '.json',
 			handleAs: 'json',
 			load: dojo.hitch(this, function(platform){
+				console.log('-- got:', platformName);
 				this.platforms[platformName] = platform;
 				--this._platformsToLoad || this.onPlatformsLoaded();
 			}),
