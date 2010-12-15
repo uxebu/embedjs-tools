@@ -39,15 +39,15 @@ var config = {
 		this.profile = params.profile || defaults.profile;
 		this.features = d.profiles[this.profile];
 		this.setValue("platform", params.platform || defaults.platform);
-		this.sourceDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.source);
-		this.buildDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.build);
-		this.testsDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.tests);
+		this.sourceDirectory = this._buildPath(this.rootDirectory, d.paths.source);
+		this.buildDirectory = this._buildPath(this.rootDirectory, d.paths.build);
+		this.testsDirectory = this._buildPath(this.rootDirectory, d.paths.tests);
 	},
 	
 	setValue:function(key, value){
 		var d = this.rawData;
 		if (key=="platform"){
-			this.platformsDirectory = util.endInSlash(this.rootDirectory + "/" + d.paths.platforms);
+			this.platformsDirectory = this._buildPath(this.rootDirectory, d.paths.platforms);
 			this.platformFile = this.platformsDirectory + value + ".json";
 		}
 	},
@@ -59,4 +59,23 @@ var config = {
 		ret = this.buildDirectory + ret;
 		return ret;
 	},
+	
+	_buildPath:function(rootDirectory, addOn){
+		// summary: Build the correct using the two components, if addOn is a path itself return only that.
+		// rootDirectory: String
+		// 		The root from where all other paths are relative.
+		// 		E.g. "/usr/cain/embedjs"
+		// addOn: String
+		// 		The path to be added to the rootDirectory.
+		// 		E.g. "platforms" which results in "/usr/cain/embedjs/platforms"
+		// 		Might also be an absolute path!
+		// 		Like so: "/Users/cain/embedjs/platforms"
+		var ret;
+		if (addOn.substr(0,1)=="/"){
+			ret = addOn;
+		} else {
+			ret = rootDirectory + "/" + addOn;
+		}
+		return util.endInSlash(ret);
+	}
 };
