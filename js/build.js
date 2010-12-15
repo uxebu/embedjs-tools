@@ -76,7 +76,9 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	if(cmdLine.getBoolean(cmdLine.parameters.keepLines)){
 		optimizeType += ".keepLines";
 	}
-	var stripConsole = cmdLine.getBoolean(cmdLine.parameters.stripConsole) ? "all" : "none";
+	var stripConsole = typeof cmdLine.parameters.stripConsole != "undefined" ? 
+			( cmdLine.getBoolean(cmdLine.parameters.stripConsole) ? "all" : "none" ) :
+			"all";
 	
 	compressedFileName = buildFileNamePrefix + ".js";
 	file.write(compressedFileName, ""); // Make sure the empty file exists!
