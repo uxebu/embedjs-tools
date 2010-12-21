@@ -47,12 +47,17 @@ var allValidPlatforms = platform.getAllValid(config.platformsDirectory, cmdLine.
 //	create the uncompressed files, using some simple java stuff, if configured so.
 //
 var uncompressed = typeof cmdLine.parameters.uncompressed=="undefined" ? config.rawData.build.generateUncompressedFiles : cmdLine.getBoolean(cmdLine.parameters.uncompressed);
+
+// check what profile name to use for filename.
+var customProfileName = cmdLine.parameters.customProfileName || config.profile;
+
 for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	p = allValidPlatforms[i];
 	config.setValue("platform", p);
 	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
-	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });	
-	var buildFileNamePrefix = config.getBuildFilenamePrefix(config.profile, p);
+	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
+	
+	var buildFileNamePrefix = config.getBuildFilenamePrefix(customProfileName, p);
 	
 
 	var uncompressedFileName;

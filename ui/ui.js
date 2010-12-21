@@ -368,9 +368,9 @@ var ebti = {
 				}
 				--this._dependencyFilesToLoad && this.onDependendcyFilesLoaded();
 			}),
-			error: function(){
+			error: dojo.hitch(this, function(){
 				--this._dependencyFilesToLoad && this.onDependendcyFilesLoaded();
-			}
+			})
 		});
 	},
 	
@@ -385,6 +385,7 @@ var ebti = {
 		this.buildDetails = {};
 		this.buildOrder = {};
 		dojo.byId('currentProfileName').innerHTML = this.currentProfileName;
+		dojo.byId('customProfileName').value = this.currentProfileName;
 		dojo.byId('currentProfile').value = '"' + this.currentProfile.join('", "') + '"';
 		dojo.map(this.currentProfile, dojo.hitch(this, 'addFeature'));
 		this.renderBuildDetails();
@@ -523,6 +524,7 @@ var ebti = {
 		}
 		var query = dojo.objectToQuery({
 			name: this.currentProfileName,
+			customProfileName: dojo.byId('customProfileName').value,
 			features: this.currentProfile.join(','),
 			path: this.pathToConfig,
 			platforms: this.platformNames.join(','),

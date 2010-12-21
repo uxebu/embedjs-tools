@@ -1,7 +1,7 @@
 <?php
 
 $params = array(
-	'path', 'name', 'features', 'platforms', 'keepLines', 'stripConsole', 'uncompressed', 'verbose'
+	'path', 'name', 'features', 'platforms', 'keepLines', 'stripConsole', 'uncompressed', 'verbose', 'customProfileName'
 );
 
 echo "<pre>Invoking script:\n";
