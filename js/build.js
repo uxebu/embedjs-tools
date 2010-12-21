@@ -70,7 +70,7 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	for (var j=0, l1=filesWithFullPath.length; j<l1; j++){
 		file.appendFile(filesWithFullPath[j], uncompressedFileName);
 	}
-	
+	print('  done.');
 	
 	// Create compressed source file.
 	var fileContents = fileUtil.readFile(uncompressedFileName);
@@ -104,6 +104,64 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 		fileUtil.deleteFile(uncompressedFileName);
 	}
 	
+	// templating.
+	print('');
+	print('Templating:');
+
+	
+	// step 1: read template
+	var tplName = config.templates.templatePath + config.templates.templateName + '.tpl';
+	var tpl = fileUtil.readFile(tplName);
+	
+	// step 2: get path from template to relative root
+	var tplDirDepth = config.rawData.templates.templatePath.split('/').length; // FIXME: This is wrong. If there are '..'-s in the path, this fails.
+	var pathSuffix = '';
+	while(tplDirDepth--){
+		pathSuffix += '../';
+	}
+	
+	// step 3: replace {{code}} (build)
+	var buildTpl = tpl.replace('{{code}}', '<script src="' + pathSuffix + compressedFileName.replace(config.rootDirectory + '/', "") + '"></script>');
+	
+	// step 4: replace {{code}} (tags)
+	var scriptTags = '\n';
+	files.forEach(function(_filename){
+		scriptTags += '<script src="' + pathSuffix + config.rawData.paths.source + '/' + _filename + '"></script>\n';
+	})
+	var tagsTpl = tpl.replace('{{code}}', scriptTags);
+	
+	// step 5: replace others
+	var re = /\{\{[^\}]+\}\}/g;
+	var tags = tpl.match(re);
+	if(tags !== null){
+		print('  additional tags found, replacing...');
+		tags.forEach(function(_tag){
+			if(_tag == '{{code}}'){
+				return; // already done.
+			}
+			// let's see if there's a file...
+			var _tagStripped = _tag.substring(2, _tag.length - 2);
+			print('    checking ' + _tagStripped);
+			var replName = config.templates.replacementPath + _tagStripped + '-' + p + '.tpl';
+			var repl = fileUtil.readFile(replName);
+			
+			// replace action
+			buildTpl = buildTpl.replace(_tag, repl);
+			tagsTpl = tagsTpl.replace(_tag, repl);
+		});
+	}
+	
+	// step 6: write (build)
+	var buildFileName = config.templates.templatePath + config.templates.templateName + '-' + customProfileName + '-' + p + '.html';
+	print('  writing ' + buildFileName);
+	fileUtil.saveFile(buildFileName, buildTpl, 'utf-8');
+
+	// step 7: write (tags)
+	var tagsFileName = config.templates.templatePath + config.templates.templateName + '-' + customProfileName + '-' + p + '.tags.html';
+	print('  writing ' + tagsFileName);
+	fileUtil.saveFile(tagsFileName, tagsTpl, 'utf-8');
+
+	print('');
 	print("All done for '" + p + "'.");
 	print("");
 
