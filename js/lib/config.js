@@ -62,11 +62,18 @@ var config = {
 		}
 	},
 	
-	getBuildFilenamePrefix:function(profile, platform){
+	getBuildFilenamePrefixWithPath:function(profile, platform){
 		var ret = this.rawData.build.fileName;
 		// Replace ${PROFILE} and ${PLATFORM}.
 		ret = ret.replace("${PROFILE}", profile).replace("${PLATFORM}", platform);
 		ret = this.buildDirectory + ret;
 		return ret;
 	},
+	
+	getBuildFilenamePrefix:function(profile, platform){
+		var ret = this.rawData.build.fileName;
+		// Replace ${PROFILE} and ${PLATFORM}.
+		ret = ret.replace("${PROFILE}", profile).replace("${PLATFORM}", platform);
+		return ret;
+	}
 };

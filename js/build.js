@@ -56,8 +56,9 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	config.setValue("platform", p);
 	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
 	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
-	
-	var buildFileNamePrefix = config.getBuildFilenamePrefix(customProfileName, p);
+
+	var buildFileNameNoPath = config.getBuildFilenamePrefix(customProfileName, p);
+	var buildFileNamePrefix = config.buildDirectory + p + '/' + customProfileName + '/' + buildFileNameNoPath;
 	
 
 	var uncompressedFileName;
@@ -66,7 +67,7 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	// Create uncompressed source file
 	uncompressedFileName = buildFileNamePrefix + ".uncompressed.js";
 	print("Writing uncompressed file for '" + p + "' to " + uncompressedFileName.replace(config.rootDirectory, ""));
-	file.write(uncompressedFileName, ""); // Make sure the empty file exists!
+	fileUtil.saveUtf8File(uncompressedFileName, ""); // Make sure the empty file exists!
 	for (var j=0, l1=filesWithFullPath.length; j<l1; j++){
 		file.appendFile(filesWithFullPath[j], uncompressedFileName);
 	}
@@ -123,7 +124,7 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 		}
 		
 		// step 3: replace {{code}} (build)
-		var buildTpl = tpl.replace('{{code}}', '<script src="' + pathSuffix + compressedFileName.replace(config.rootDirectory + '/', "") + '"></script>');
+		var buildTpl = tpl.replace('{{code}}', '<script src="' + buildFileNameNoPath + '.js"></script>');
 		
 		// step 4: replace {{code}} (tags)
 		var scriptTags = '\n';
@@ -154,7 +155,7 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 		}
 		
 		// step 6: write (build)
-		var buildFileName = config.templates.templatePath + config.templates.templateName + '-' + customProfileName + '-' + p + '.html';
+		var buildFileName = config.buildDirectory + p + '/' + customProfileName + '/' + config.templates.templateName + '.html';
 		print('  writing ' + buildFileName);
 		fileUtil.saveFile(buildFileName, buildTpl, 'utf-8');
 	
