@@ -53,8 +53,8 @@ var cmdLine = {
 	},
 	
 	getBoolean:function(value){
-		var falseValues = ["0", "false", "no", "null"];
-		return falseValues.indexOf(value)!=-1 ? false : true;
+		var falseValues = ["0", "false", "no", "null", undefined];
+		return ( falseValues.indexOf(value) == -1 );
 	},
 	
 	mergeParams:function(arrayParam, mergeIn){

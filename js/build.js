@@ -1,5 +1,6 @@
 var args = Array.prototype.slice.call(arguments);
-var _jsToolsPath = environment["user.dir"] + "/" + args[0];
+// check if we got a relative or absolute path
+var _jsToolsPath = args[0][0] == '/' ? args[0] : environment["user.dir"] + "/" + args[0];
 load(_jsToolsPath + "/lib/_global.js");
 load(_jsToolsPath + "/lib/util.js");
 load(_jsToolsPath + "/lib/dojo.js");
@@ -7,6 +8,10 @@ load(_jsToolsPath + "/lib/cmdLine.js");
 load(_jsToolsPath + "/lib/config.js");
 load(_jsToolsPath + "/lib/file.js");
 load(_jsToolsPath + "/lib/platform.js");
+
+load(_jsToolsPath + "/lib/buildUtil.js");
+load(_jsToolsPath + "/lib/fileUtil.js");
+
 
 // Command config
 cmdLine.setup(args.slice(2), {
@@ -42,36 +47,64 @@ var allValidPlatforms = platform.getAllValid(config.platformsDirectory, cmdLine.
 //	create the uncompressed files, using some simple java stuff, if configured so.
 //
 var uncompressed = typeof cmdLine.parameters.uncompressed=="undefined" ? config.rawData.build.generateUncompressedFiles : cmdLine.getBoolean(cmdLine.parameters.uncompressed);
+
+// check what profile name to use for filename.
+var customProfileName = cmdLine.parameters.customProfileName || config.profile;
+
 for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	p = allValidPlatforms[i];
 	config.setValue("platform", p);
 	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
 	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
 	
-	// Compress and write file in the build directory.
-// TODO enable hooking other compressors in here ...
-	var args = {
-		// Very strange way of passing the params to shrinksafe, if you know it better
-		// please fix it. Best would be importing the java class I guess and calling it directly in here
-		// ... if I have more time ... help welcome!!!!!!
-		args:[
-			"-jar",
-			_jsToolsPath +"/../shrinksafe.jar",
-		].concat(filesWithFullPath), // Add the full path to the js files.
-		output:""
-	};
-	runCommand("java", args);
-	var buildFileNamePrefix = config.getBuildFilenamePrefix(config.profile, p);
-	print("Writing built file for '" + p + "' to " + buildFileNamePrefix.replace(config.rootDirectory, "") + ".js");
-	file.write(buildFileNamePrefix + ".js", args.output);
+	var buildFileNamePrefix = config.getBuildFilenamePrefix(customProfileName, p);
 	
-	// Create uncompressed source file, if configured to do so.
-	if (uncompressed){
-		var fileName = buildFileNamePrefix + ".uncompressed.js";
-		print("Writing uncompressed file for '" + p + "' to " + fileName.replace(config.rootDirectory, ""));
-		file.write(fileName, ""); // Make sure the empty file exists!
-		for (var j=0, l1=filesWithFullPath.length; j<l1; j++){
-			file.appendFile(filesWithFullPath[j], fileName);
-		}
+
+	var uncompressedFileName;
+	var compressedFileName;
+	
+	// Create uncompressed source file
+	uncompressedFileName = buildFileNamePrefix + ".uncompressed.js";
+	print("Writing uncompressed file for '" + p + "' to " + uncompressedFileName.replace(config.rootDirectory, ""));
+	file.write(uncompressedFileName, ""); // Make sure the empty file exists!
+	for (var j=0, l1=filesWithFullPath.length; j<l1; j++){
+		file.appendFile(filesWithFullPath[j], uncompressedFileName);
 	}
+	
+	
+	// Create compressed source file.
+	var fileContents = fileUtil.readFile(uncompressedFileName);
+	
+	// Setup shrinksafe params.
+	var copyright = "";
+	var optimizeType = "shrinksafe"; // TODO enable hooking other compressors in here ...
+	if(cmdLine.getBoolean(cmdLine.parameters.keepLines)){
+		optimizeType += ".keepLines";
+	}
+	var stripConsole = typeof cmdLine.parameters.stripConsole != "undefined" ? 
+			( cmdLine.getBoolean(cmdLine.parameters.stripConsole) ? "all" : "none" ) :
+			"all";
+	
+	compressedFileName = buildFileNamePrefix + ".js";
+	file.write(compressedFileName, ""); // Make sure the empty file exists!
+	print("Writing compressed file for '" + p + "' to " + compressedFileName.replace(config.rootDirectory, ""));
+
+	// compress...
+	try{
+		fileContents = buildUtil.optimizeJs(compressedFileName, fileContents, copyright, optimizeType, stripConsole);
+		
+		//Write out the file with appropriate copyright.
+		fileUtil.saveUtf8File(compressedFileName, fileContents);
+	}catch(e){
+		print("Could not compress file: " + compressedFileName + ", error: " + e);
+	}
+	
+	if(!uncompressed){ // remove the uncompressed file
+		print("Removing uncompressed file for '" + p + "'.");
+		fileUtil.deleteFile(uncompressedFileName);
+	}
+	
+	print("All done for '" + p + "'.");
+	print("");
+
 }

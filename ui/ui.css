@@ -1,0 +1,201 @@
+.indented {
+	padding-left: 20px;
+}
+
+html, 
+body,
+#mother {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	cursor: default;
+}
+
+#workspace {
+	visibility: hidden;
+	height: 0;
+	width: 0;
+	position: absolute;
+	overflow: hidden;
+}
+
+/* dialog */
+#configStatusMsg,
+#configErrorMsg {
+	opacity: 0;
+	text-align: center;
+}
+#configSelector {
+	opacity: 0.5;
+}
+#configErrorMsg {
+	color: red;
+}
+.configDefault #configSelector,
+.configError #configErrorMsg,
+.configError #configSelector,
+.configLoading #configStatusMsg {
+	opacity: 1;
+} 
+
+/********/
+/* Head */
+/********/
+
+#head {
+	height: 140px;
+}
+
+#head h6 {
+	margin: 0 0 5px 0;
+}
+
+/* profile tab */
+
+#profileSettings div {
+	padding: 2px 0;
+}
+#currentProfileName {
+	font-weight: bold;
+}
+#currentProfile {
+	width: 70%;
+}
+
+/* platform tab */
+
+#platformSettings div {
+	display: inline-block;
+	padding: 2px 5px;
+}
+
+/* build tab */
+
+.buildSettingsBlock {
+	display: inline-block;
+	padding: 0 5px 10px 5px;
+}
+
+/****************/
+/* Feature List */
+/****************/
+
+#featureList {
+	width: 200px;
+	overflow: auto;
+}
+
+/*****************/
+/* Platform Pane */
+/*****************/
+#platformsPaneWrapper {
+	padding: 5px 0;	
+}
+.platformDetails {
+	padding: 0 10px;
+	/* display: inline-block; */
+	border-left: solid 1px #808080;
+}
+.platformDetails.first {
+	border: none;
+}
+#platformsPane {
+	display: box;
+	display: -moz-box;
+	display: -webkit-box;
+	width: 100%;
+	height: 100%;
+}
+.featureDetails {
+	padding: 5px 5px 10px 5px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.featureDetails:hover {
+	background: #DFEDFA;
+}
+.featureDetails div {
+	padding-left: 10px;
+}
+.featureDetails h6 {
+	margin: 2px 0;
+	overflow: hidden;
+}
+.featureDetails .featureName {
+	float: left;
+	padding-right: 50px;
+}
+.featureDetails .fInfo {
+	float: right;
+	width: 10px;
+	height: 10px;
+	cursor:help;
+	margin: 0 2px;
+	padding: 0;
+	visibility: hidden;
+}
+.featureDetails:hover h6 .fInfo {
+	display: block;
+	visibility: visible;
+}
+.fileDetails {
+	overflow: hidden;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.fileDetails:hover {
+	/* background: #CFDDEA; */
+	background: #CFE8FF;
+	-moz-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .5);
+	-webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .5);
+}
+.fileDetails:hover .fInfo {
+	visibility: visible;
+}
+.fileName {
+	float: left;
+	padding-right: 25px;
+}
+.included {
+	color: #808080;
+}
+.platformSummary {
+	padding: 10px;
+	margin-top: 10px;
+	border-top: solid 1px #808080;
+}
+
+/*************/
+/* File Pane */
+/*************/
+#filePaneWrapper {
+	padding: 5px 0;	
+}
+#filePane {
+	display: box;
+	display: -moz-box;
+	display: -webkit-box;
+	width: 100%;
+	height: 100%;
+}
+.fileOrder {
+	padding: 0 10px;
+	/* display: inline-block; */
+	border-left: solid 1px #808080;
+}
+.fileOrder.first {
+	border: none;
+}
+.fileOrderList {
+	padding-bottom: 10px;
+}
+
+
+/* outline */
+[role=tab],
+[role=combobox],
+[role=dialog] {
+	outline: none !important;
+}
