@@ -1,0 +1,11 @@
+{
+	"baseFeature": [
+		"baseFeature/implementation.js"
+	],
+	"featureOne": [
+		"featureOne/implementation.js"
+	],
+	"featureTwo": [
+		"featureTwo/implementation.js"
+	]
+}

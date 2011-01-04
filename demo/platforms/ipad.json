@@ -1,0 +1,6 @@
+{
+	// featureTwo has a different implementation for the iPad.
+	"featureTwo": [
+		"featureTwo/implementationTouch.js"
+	]	
+}

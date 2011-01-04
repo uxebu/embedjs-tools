@@ -1,0 +1,12 @@
+{
+    
+    "implementation.js":[
+		"baseFeature"
+	],
+    
+	// The implementationTouch also has a dependency on featureOne.
+    "implementationTouch.js":[
+		"baseFeature",
+		"featureOne"
+	],
+}

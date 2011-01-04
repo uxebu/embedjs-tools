@@ -1,0 +1,3 @@
+app.featureTwo = {
+	implementedFor: ["desktop"]
+};

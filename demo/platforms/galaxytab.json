@@ -1,0 +1,6 @@
+{
+	// featureTwo has a different implementation for the Galaxy Tab.
+	"featureTwo": [
+		"featureTwo/implementationTouch.js"
+	]	
+}
