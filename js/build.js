@@ -58,7 +58,7 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
 
 	var buildFileNameNoPath = config.getBuildFilenamePrefix(customProfileName, p);
-	var buildFileNamePrefix = config.buildDirectory + p + '/' + customProfileName + '/' + buildFileNameNoPath;
+	var buildFileNamePrefix = config.buildDirectory + customProfileName + '/' + p + '/' + buildFileNameNoPath;
 	
 
 	var uncompressedFileName;
@@ -113,20 +113,25 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	
 		
 		// step 1: read template
-		var tplName = config.templates.templatePath + config.templates.templateName + '.tpl';
+		print('  - reading template...');
+		var tplPath = config.templates.templatePath.replace("${PROFILE}", customProfileName).replace("${PLATFORM}", p);
+		var tplName = tplPath + config.templates.templateName + '.tpl';
 		var tpl = fileUtil.readFile(tplName);
 		
 		// step 2: get path from template to relative root
-		var tplDirDepth = config.rawData.templates.templatePath.split('/').length; // FIXME: This is wrong. If there are '..'-s in the path, this fails.
+		print('  - calculating path depth...');
+		var tplDirDepth = config.rawData.templates.developmentOutput.split('/').length; // FIXME: This is wrong. If there are '..'-s in the path, this fails.
 		var pathSuffix = '';
 		while(tplDirDepth--){
 			pathSuffix += '../';
 		}
 		
 		// step 3: replace {{code}} (build)
+		print('  - replacing code, 1/2...');
 		var buildTpl = tpl.replace('{{code}}', '<script src="' + buildFileNameNoPath + '.js"></script>');
 		
 		// step 4: replace {{code}} (tags)
+		print('  - replacing code, 2/2...');
 		var scriptTags = '\n';
 		files.forEach(function(_filename){
 			scriptTags += '<script src="' + pathSuffix + config.rawData.paths.source + '/' + _filename + '"></script>\n';
@@ -134,18 +139,20 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 		var tagsTpl = tpl.replace('{{code}}', scriptTags);
 		
 		// step 5: replace others
+		print('  - replacing others...');
 		var re = /\{\{[^\}]+\}\}/g;
 		var tags = tpl.match(re);
 		if(tags !== null){
-			print('  additional tags found, replacing...');
+			print('    - additional tags found, replacing...');
 			tags.forEach(function(_tag){
 				if(_tag == '{{code}}'){
 					return; // already done.
 				}
 				// let's see if there's a file...
 				var _tagStripped = _tag.substring(2, _tag.length - 2);
-				print('    checking ' + _tagStripped);
-				var replName = config.templates.replacementPath + _tagStripped + '-' + p + '.tpl';
+				print('      checking ' + _tagStripped);
+				var replPath = config.templates.replacementPath.replace("${PROFILE}", customProfileName).replace("${PLATFORM}", p);
+				var replName = replPath + _tagStripped + '-' + p + '.tpl';
 				var repl = fileUtil.readFile(replName);
 				
 				// replace action
@@ -155,12 +162,15 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 		}
 		
 		// step 6: write (build)
-		var buildFileName = config.buildDirectory + p + '/' + customProfileName + '/' + config.templates.templateName + '.html';
+		print('  - writing (build)...');
+		var buildFileName = config.buildDirectory + customProfileName + '/' + p + '/' + config.templates.templateName + '.html';
 		print('  writing ' + buildFileName);
 		fileUtil.saveFile(buildFileName, buildTpl, 'utf-8');
 	
 		// step 7: write (tags)
-		var tagsFileName = config.templates.templatePath + config.templates.templateName + '-' + customProfileName + '-' + p + '.tags.html';
+		print('  - writing (dev)...');
+		var devOutputPath = config.templates.developmentOutput.replace("${PROFILE}", customProfileName).replace("${PLATFORM}", p);
+		var tagsFileName = devOutputPath + config.templates.templateName + '-' + customProfileName + '-' + p + '.tags.html';
 		print('  writing ' + tagsFileName);
 		fileUtil.saveFile(tagsFileName, tagsTpl, 'utf-8');
 	

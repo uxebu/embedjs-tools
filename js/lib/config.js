@@ -52,6 +52,7 @@ var config = {
 		this.templates.templateName = d.templates.templateName;
 		this.templates.templatePath = util.endInSlash(this.rootDirectory + "/" + d.templates.templatePath);
 		this.templates.replacementPath = util.endInSlash(this.rootDirectory + "/" + d.templates.replacementPath);
+		this.templates.developmentOutput = util.endInSlash(this.rootDirectory + "/" + d.templates.developmentOutput);
 	},
 	
 	setValue:function(key, value){
