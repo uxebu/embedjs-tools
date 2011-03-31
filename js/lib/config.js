@@ -44,15 +44,15 @@ var config = {
 			this.features = d.profiles[this.profile];	
 		}
 		this.setValue("platform", params.platform || defaults.platform);
-		this.sourceDirectory = this._buildPath(this.rootDirectory, d.paths.source);
-		this.buildDirectory = this._buildPath(this.rootDirectory, d.paths.build);
-		this.testsDirectory = this._buildPath(this.rootDirectory, d.paths.tests);
+		this.sourceDirectory = this.buildPath(this.rootDirectory, d.paths.source);
+		this.buildDirectory = this.buildPath(this.rootDirectory, d.paths.build);
+		this.testsDirectory = this.buildPath(this.rootDirectory, d.paths.tests);
 	},
 	
 	setValue:function(key, value){
 		var d = this.rawData;
 		if (key=="platform"){
-			this.platformsDirectory = this._buildPath(this.rootDirectory, d.paths.platforms);
+			this.platformsDirectory = this.buildPath(this.rootDirectory, d.paths.platforms);
 			this.platformFile = this.platformsDirectory + value + ".json";
 		}
 	},
@@ -65,7 +65,7 @@ var config = {
 		return ret;
 	},
 	
-	_buildPath:function(rootDirectory, addOn){
+	buildPath:function(rootDirectory, addOn, endInSlash){
 		// summary: Build the correct using the two components, if addOn is a path itself return only that.
 		// rootDirectory: String
 		// 		The root from where all other paths are relative.
@@ -81,6 +81,6 @@ var config = {
 		} else {
 			ret = rootDirectory + "/" + addOn;
 		}
-		return util.endInSlash(ret);
+		return endInSlash || typeof endInSlash=="undefined" ? util.endInSlash(ret) : ret;
 	}
 };
