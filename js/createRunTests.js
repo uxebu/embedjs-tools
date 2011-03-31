@@ -13,6 +13,15 @@ cmdLine.setup(args.slice(2), {
 	parameters:
 		defaultCmdLineParameters
 		.concat(platform.cmdLineParamsAddOn) // Add the params normally used when working on platforms stuff.
+		.concat(
+			[
+				{
+					name:"dev",
+					help:"Generate the tests in dev mode, which means don't include builds but each source file.",
+					exampleValues:["true", "yes", "false", "no"]
+				}
+			]
+		)
 	}
 );
 
@@ -26,11 +35,16 @@ load(_jsToolsPath + "/lib/FileList.js");
 // Validate the platforms given and keep working with the clean list.
 var allValidPlatforms = platform.getAllValid(config.platformsDirectory);
 
-function renderRunTestsTpl(content, platform, isWidget){
+function renderRunTestsTpl(content, platform, isWidget, files){
 	// summary: Render the runTests.html.tpl for the given platform.
-	var filename = isWidget ? "embedJS/" : "../build/";
-	filename += "embed-kitchensink-" + platform + ".js"
-	var ret = content.replace("${embedjs_filename}", filename);
+	var directory = isWidget ? "embedJS/" : "../build/";
+	if (files && files.length){
+		files = files.map(function(f){ return "../" + config.buildPath(config.rawData.paths.source, f, false) });
+		fillString = files.join('"></script>\n\t\t<script type="text/javascript" src="');
+	} else {
+		fillString = directory + "embed-kitchensink-" + platform + ".js"
+	}
+	var ret = content.replace("${embedjs_filename}", fillString);
 	var ret = ret.replace("${platform}", platform);
 	return ret;
 }
@@ -71,6 +85,17 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	var destFile = config.testsDirectory + "runTests-widget-" + p + ".html";
 	print("Writing '" + destFile + "'");
 	writeFile(destFile, renderRunTestsTpl(tpl, p, true));
+	// Write the dev file if configured.
+	if (cmdLine.parameters.dev){
+		// Get all the files that need to be included.
+		config.setValue("platform", p);
+		var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
+		//var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
+		
+		var destFile = config.testsDirectory + "runTests-dev-" + p + ".html";
+		print("Writing '" + destFile + "'");
+		writeFile(destFile, renderRunTestsTpl(tpl, p, false, files));
+	}
 }
 destFile = config.testsDirectory + "index.html";
 print("Writing '" + destFile + "'");
