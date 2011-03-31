@@ -13,15 +13,6 @@ cmdLine.setup(args.slice(2), {
 	parameters:
 		defaultCmdLineParameters
 		.concat(platform.cmdLineParamsAddOn) // Add the params normally used when working on platforms stuff.
-		.concat(
-			[
-				{
-					name:"dev",
-					help:"Generate the tests in dev mode, which means don't include builds but each source file.",
-					exampleValues:["true", "yes", "false", "no"]
-				}
-			]
-		)
 	}
 );
 
@@ -86,16 +77,12 @@ for (var i=0, l=allValidPlatforms.length, p; i<l; i++){
 	print("Writing '" + destFile + "'");
 	writeFile(destFile, renderRunTestsTpl(tpl, p, true));
 	// Write the dev file if configured.
-	if (cmdLine.parameters.dev){
-		// Get all the files that need to be included.
-		config.setValue("platform", p);
-		var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
-		//var filesWithFullPath = files.map(function(f){ return config.sourceDirectory + f });
-		
-		var destFile = config.testsDirectory + "runTests-dev-" + p + ".html";
-		print("Writing '" + destFile + "'");
-		writeFile(destFile, renderRunTestsTpl(tpl, p, false, files));
-	}
+	// Get all the files that need to be included.
+	config.setValue("platform", p);
+	var files = new FileList().get(config.platformFile, config.features, config.sourceDirectory);
+	var destFile = config.testsDirectory + "runTests-dev-" + p + ".html";
+	print("Writing '" + destFile + "'");
+	writeFile(destFile, renderRunTestsTpl(tpl, p, false, files));
 }
 destFile = config.testsDirectory + "index.html";
 print("Writing '" + destFile + "'");
