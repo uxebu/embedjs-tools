@@ -46,7 +46,9 @@ var config = {
 		this.setValue("platform", params.platform || defaults.platform);
 		this.sourceDirectory = this.buildPath(this.rootDirectory, d.paths.source);
 		this.buildDirectory = this.buildPath(this.rootDirectory, d.paths.build);
-		this.testsDirectory = this.buildPath(this.rootDirectory, d.paths.tests);
+		if(d.paths.tests){ // Not all profiles need to contain a tests property, yet.
+			this.testsDirectory = this.buildPath(this.rootDirectory, d.paths.tests);
+		}
 	},
 	
 	setValue:function(key, value){
